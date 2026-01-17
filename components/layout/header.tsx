@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { Menu, Bell, PlusCircle } from 'lucide-react';
+import { Menu, Bell, PlusCircle, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -23,6 +24,14 @@ export function Header({ onQuickAdd }: HeaderProps) {
   const t = useTranslations('common');
   const nav = useTranslations('nav');
   const locale = useLocale();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // Clear auth cookie
+    document.cookie = 'tucker_auth_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    router.push(`/${locale}/login`);
+    router.refresh();
+  };
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-background/80">
@@ -74,6 +83,10 @@ export function Header({ onQuickAdd }: HeaderProps) {
             <span className="sr-only">Notifications</span>
           </Button>
           <LanguageToggle />
+          <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout">
+            <LogOut className="h-5 w-5" />
+            <span className="sr-only">Logout</span>
+          </Button>
         </div>
       </div>
     </header>

@@ -2,87 +2,75 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { createClient } from '@/lib/supabase/client';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+const VALID_USERNAME = 'EJN';
+const VALID_PASSWORD = 'Ejn!79021';
+const AUTH_COOKIE_NAME = 'tucker_auth_session';
 
 export default function LoginPage() {
   const t = useTranslations('auth');
+  const locale = useLocale();
   const router = useRouter();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  });
-
-  const onSubmit = async (data: LoginFormData) => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
-
-    if (authError) {
-      setError(t('invalidCredentials'));
+    if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+      // Set persistent cookie (expires in 1 year)
+      const expiryDate = new Date();
+      expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+      document.cookie = `${AUTH_COOKIE_NAME}=authenticated; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
+      
+      console.log('[AUTH] Login successful, redirecting...');
+      router.push(`/${locale}`);
+      router.refresh();
+    } else {
+      setError('Invalid username or password');
       setLoading(false);
-      return;
     }
-
-    router.push('/en/dashboard');
-    router.refresh();
   };
 
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h1 className="text-2xl font-bold tracking-tight text-emerald-900">Tucker Pool Service</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t('login')}</p>
+        <p className="mt-1 text-sm text-muted-foreground">CRM Login</p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleLogin} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">{t('email')}</Label>
+          <Label htmlFor="username">Username</Label>
           <Input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            {...register('email')}
-            className={errors.email ? 'border-red-500' : ''}
+            id="username"
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
           />
-          {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">{t('password')}</Label>
+          <Label htmlFor="password">Password</Label>
           <Input
             id="password"
             type="password"
             placeholder="••••••••"
-            {...register('password')}
-            className={errors.password ? 'border-red-500' : ''}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
           />
-          {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
         </div>
 
         {error && (
@@ -91,7 +79,7 @@ export default function LoginPage() {
 
         <Button type="submit" className="w-full" disabled={loading}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {t('login')}
+          Sign In
         </Button>
       </form>
     </div>

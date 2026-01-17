@@ -1,8 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-// AUTH DISABLED FOR TESTING - Set to false to enable authentication
-const AUTH_DISABLED = true;
-
+const AUTH_COOKIE_NAME = 'tucker_auth_session';
 const locales = ['en', 'es'];
 const defaultLocale = 'en';
 
@@ -14,46 +12,39 @@ function getLocaleFromPath(pathname: string): string | null {
   return null;
 }
 
+function isAuthenticated(request: NextRequest): boolean {
+  const authCookie = request.cookies.get(AUTH_COOKIE_NAME);
+  return authCookie?.value === 'authenticated';
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip API routes
-  if (pathname.startsWith('/api')) {
+  // Skip API routes and static files
+  if (pathname.startsWith('/api') || pathname.startsWith('/_next')) {
     return NextResponse.next();
   }
 
   // Get locale from path or use default
   const locale = getLocaleFromPath(pathname) || defaultLocale;
-
-  // If auth is disabled, just pass through (redirect root to locale)
-  if (AUTH_DISABLED) {
-    // Redirect login page to dashboard when auth is disabled
-    if (pathname.includes('/login')) {
-      const url = request.nextUrl.clone();
-      url.pathname = `/${locale}`;
-      return NextResponse.redirect(url);
-    }
-    return NextResponse.next();
-  }
-
-  // Auth enabled - import and use session management
-  const { updateSession } = await import('@/lib/supabase/middleware');
   const isLoginPath = pathname.includes('/login');
-  const { supabaseResponse, user } = await updateSession(request);
+  const isLoggedIn = isAuthenticated(request);
 
-  if (!user && !isLoginPath) {
+  // Redirect to login if not authenticated
+  if (!isLoggedIn && !isLoginPath) {
     const url = request.nextUrl.clone();
     url.pathname = `/${locale}/login`;
     return NextResponse.redirect(url);
   }
 
-  if (user && isLoginPath) {
+  // Redirect to dashboard if already logged in and trying to access login
+  if (isLoggedIn && isLoginPath) {
     const url = request.nextUrl.clone();
     url.pathname = `/${locale}`;
     return NextResponse.redirect(url);
   }
 
-  return supabaseResponse;
+  return NextResponse.next();
 }
 
 export const config = {
