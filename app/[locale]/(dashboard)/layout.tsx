@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Header } from '@/components/layout/header';
 import { Sidebar } from '@/components/layout/sidebar';
+import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/sonner';
 
 export default function DashboardLayout({
@@ -9,12 +10,13 @@ export default function DashboardLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <Header />
-      <div className="mx-auto flex w-full max-w-6xl gap-6 px-4 py-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-1 gap-6 px-4 py-6">
         <Sidebar />
         <main className="flex-1 pb-10">{children}</main>
       </div>
+      <Footer />
       <Toaster richColors closeButton position="top-right" />
     </div>
   );
