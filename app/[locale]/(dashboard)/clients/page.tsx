@@ -16,10 +16,10 @@ export default async function ClientsPage({
   const t = await getTranslations('clients');
   const common = await getTranslations('common');
   const serviceDays = await getTranslations('serviceDays');
-  const supabase = await createClient();
+  const supabase = createClient();
   const params = await searchParams;
 
-  let query = supabase.from('clients').select('*').order('name');
+  let query = (supabase.from('clients') as any).select('*').order('name');
 
   if (params.active === 'true') {
     query = query.eq('is_active', true);
