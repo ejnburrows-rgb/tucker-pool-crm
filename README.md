@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tucker Pool Service CRM
+
+A bilingual (English/Spanish) full-stack CRM for pool service businesses built with Next.js 14, Supabase, and shadcn/ui.
+
+## Features
+
+- **Bilingual UI**: Full English/Spanish support with language toggle
+- **Client Management**: Track clients, service days, pool types, and contact info
+- **Payment Tracking**: Monthly invoices with status tracking (paid, pending, overdue)
+- **Work Orders**: Additional work requests with cost tracking
+- **Schedule View**: Weekly calendar showing appointments
+- **SMS Reminders**: Automated payment reminders via Twilio
+- **Email Notifications**: Email support via Resend
+- **Overdue Dashboard**: Quick view of overdue payments and work orders
+
+## Tech Stack
+
+- **Framework**: Next.js 14 (App Router)
+- **Database**: Supabase (PostgreSQL)
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Forms**: React Hook Form + Zod
+- **i18n**: next-intl
+- **SMS**: Twilio
+- **Email**: Resend
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone and Install
+
+```bash
+git clone <repo-url>
+cd tucker-pool-crm
+npm install
+```
+
+### 2. Set Up Supabase
+
+1. Create a new Supabase project at [supabase.com](https://supabase.com)
+2. Run the migration in `supabase/migrations/0001_init.sql`
+3. Generate TypeScript types:
+   ```bash
+   npx supabase gen types typescript --project-id YOUR_PROJECT_ID > types/supabase.ts
+   ```
+
+### 3. Configure Environment Variables
+
+Copy `.env.example` to `.env.local` and fill in your values:
+
+```bash
+cp .env.example .env.local
+```
+
+Required variables:
+- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anon key
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (for cron jobs)
+- `TWILIO_ACCOUNT_SID` - Twilio account SID
+- `TWILIO_AUTH_TOKEN` - Twilio auth token
+- `TWILIO_PHONE_NUMBER` - Your Twilio phone number
+- `RESEND_API_KEY` - Resend API key
+- `CRON_SECRET` - Random secret for cron job authentication
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+├── app/
+│   ├── [locale]/           # Locale-aware routes
+│   │   ├── (auth)/         # Auth pages (login)
+│   │   └── (dashboard)/    # Dashboard pages
+│   │       ├── clients/    # Client management
+│   │       ├── payments/   # Payment tracking
+│   │       ├── work/       # Work orders
+│   │       ├── schedule/   # Weekly schedule
+│   │       └── overdue/    # Overdue summary
+│   └── api/                # API routes
+│       ├── clients/
+│       ├── payments/
+│       ├── work/
+│       ├── schedule/
+│       ├── sms/
+│       └── cron/           # Cron job endpoints
+├── components/
+│   └── layout/             # Header, Sidebar, etc.
+├── lib/
+│   ├── supabase/           # Supabase clients
+│   ├── twilio/             # Twilio client
+│   ├── resend/             # Resend client
+│   └── validations/        # Zod schemas
+├── messages/               # i18n translations
+│   ├── en.json
+│   └── es.json
+└── types/                  # TypeScript types
+```
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+### Vercel (Recommended)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Push to GitHub
+2. Import to Vercel
+3. Add environment variables
+4. Deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The `vercel.json` includes cron job configuration for daily payment reminders at 9 AM.
 
-## Deploy on Vercel
+## TypeScript Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Some TypeScript errors related to Supabase types will resolve after running:
+```bash
+npx supabase gen types typescript --project-id YOUR_PROJECT_ID > types/supabase.ts
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Then update `lib/supabase/client.ts` and `lib/supabase/server.ts` to use the generated types.
+
+## License
+
+MIT
