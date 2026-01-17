@@ -74,7 +74,7 @@ export default async function ClientsPage({
                 <CardContent className="space-y-2 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <Phone className="h-3 w-3" />
-                    <a href={`tel:${client.phone}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
+                    <a href={`tel:${client.phone}`} className="hover:underline">
                       {client.phone}
                     </a>
                   </div>
