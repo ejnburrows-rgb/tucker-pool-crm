@@ -56,17 +56,26 @@ export default function NewClientPage() {
   });
 
   const onSubmit = async (data: ClientFormData) => {
-    const supabase = createClient();
-    const { error } = await (supabase.from('clients') as any).insert(data);
+    try {
+      const response = await fetch('/api/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
 
-    if (error) {
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.error || common('errors.serverError'));
+        return;
+      }
+
+      toast.success(common('success.saved'));
+      router.push(`/${locale}/clients`);
+      router.refresh();
+    } catch (error) {
+      console.error('Error creating client:', error);
       toast.error(common('errors.serverError'));
-      return;
     }
-
-    toast.success(common('success.saved'));
-    router.push(`/${locale}/clients`);
-    router.refresh();
   };
 
   return (

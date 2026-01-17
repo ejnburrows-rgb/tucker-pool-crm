@@ -25,21 +25,23 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from('app_settings')
-        .select('*')
-        .single();
-      
-      if (data) {
-        setSettings({
-          business_name: (data as any).settings?.business_name || 'Tucker Pool Service',
-          business_phone: (data as any).settings?.business_phone || '305-555-0000',
-          business_email: (data as any).settings?.business_email || '',
-          zelle_address: (data as any).settings?.zelle_address || '',
-          default_monthly_rate: (data as any).settings?.default_monthly_rate || 150,
-          default_labor_rate: (data as any).settings?.default_labor_rate || 75,
-        });
+      try {
+        const response = await fetch('/api/settings');
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.settings) {
+            setSettings({
+              business_name: data.settings.business_name || 'Tucker Pool Service',
+              business_phone: data.settings.business_phone || '305-555-0000',
+              business_email: data.settings.business_email || '',
+              zelle_address: data.settings.zelle_address || '',
+              default_monthly_rate: data.settings.default_monthly_rate || 150,
+              default_labor_rate: data.settings.default_labor_rate || 75,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching settings:', error);
       }
     };
     fetchSettings();
@@ -47,18 +49,22 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     setLoading(true);
-    const supabase = createClient();
-    
-    const { error } = await (supabase.from('app_settings') as any).upsert({
-      id: 'default',
-      settings: settings,
-      updated_at: new Date().toISOString(),
-    });
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings }),
+      });
 
-    if (error) {
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.error || common('errors.serverError'));
+      } else {
+        toast.success(common('success.saved'));
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
       toast.error(common('errors.serverError'));
-    } else {
-      toast.success(common('success.saved'));
     }
     setLoading(false);
   };

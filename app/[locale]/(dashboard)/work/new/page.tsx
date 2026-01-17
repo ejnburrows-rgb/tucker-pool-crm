@@ -42,9 +42,15 @@ export default function NewWorkPage() {
 
   useEffect(() => {
     const fetchClients = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.from('clients').select('*').eq('is_active', true).order('name');
-      if (data) setClients(data as Client[]);
+      try {
+        const response = await fetch('/api/clients?active=true');
+        if (response.ok) {
+          const data = await response.json();
+          setClients(data as Client[]);
+        }
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+      }
     };
     fetchClients();
   }, []);
@@ -73,17 +79,26 @@ export default function NewWorkPage() {
   const totalCharge = partsCost + laborHours * laborRate;
 
   const onSubmit = async (data: WorkFormData) => {
-    const supabase = createClient();
-    const { error } = await supabase.from('additional_work').insert(data as any);
+    try {
+      const response = await fetch('/api/work', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
 
-    if (error) {
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.error || common('errors.serverError'));
+        return;
+      }
+
+      toast.success(common('success.saved'));
+      router.push(`/${locale}/work`);
+      router.refresh();
+    } catch (error) {
+      console.error('Error creating work order:', error);
       toast.error(common('errors.serverError'));
-      return;
     }
-
-    toast.success(common('success.saved'));
-    router.push(`/${locale}/work`);
-    router.refresh();
   };
 
   return (
