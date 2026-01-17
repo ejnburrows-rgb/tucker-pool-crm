@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { updateSession } from '@/lib/supabase/middleware';
+
+// AUTH DISABLED FOR TESTING - Set to false to enable authentication
+const AUTH_DISABLED = true;
 
 const locales = ['en', 'es'];
 const defaultLocale = 'en';
@@ -23,20 +25,28 @@ export async function middleware(request: NextRequest) {
   // Get locale from path or use default
   const locale = getLocaleFromPath(pathname) || defaultLocale;
 
-  // Check if path contains login
-  const isLoginPath = pathname.includes('/login');
+  // If auth is disabled, just pass through (redirect root to locale)
+  if (AUTH_DISABLED) {
+    // Redirect login page to dashboard when auth is disabled
+    if (pathname.includes('/login')) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/${locale}`;
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
 
-  // Update Supabase session
+  // Auth enabled - import and use session management
+  const { updateSession } = await import('@/lib/supabase/middleware');
+  const isLoginPath = pathname.includes('/login');
   const { supabaseResponse, user } = await updateSession(request);
 
-  // Redirect to login if not authenticated (and not already on login page)
   if (!user && !isLoginPath) {
     const url = request.nextUrl.clone();
     url.pathname = `/${locale}/login`;
     return NextResponse.redirect(url);
   }
 
-  // Redirect to dashboard if authenticated and on login page
   if (user && isLoginPath) {
     const url = request.nextUrl.clone();
     url.pathname = `/${locale}`;
