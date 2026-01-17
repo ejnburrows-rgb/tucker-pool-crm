@@ -56,26 +56,46 @@ export default function NewClientPage() {
   });
 
   const onSubmit = async (data: ClientFormData) => {
-    try {
-      const response = await fetch('/api/clients', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+    console.log('[CLIENT FORM] onSubmit triggered');
+    console.log('[CLIENT FORM] Form data:', data);
+    
+    const supabase = createClient();
+    console.log('[SUPABASE] Client created, calling insert...');
+    
+    const insertData = {
+      name: data.name,
+      phone: data.phone,
+      address: data.address,
+      city: data.city,
+      gate_code: data.gate_code || null,
+      service_day: data.service_day,
+      monthly_rate: data.monthly_rate,
+      pool_type: data.pool_type,
+      language: data.language,
+      is_active: data.is_active,
+      notes: data.notes || null,
+    };
+    
+    console.log('[SUPABASE] Insert data:', insertData);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.error || common('errors.serverError'));
-        return;
-      }
+    const { data: result, error } = await (supabase
+      .from('clients') as any)
+      .insert(insertData)
+      .select()
+      .single();
 
-      toast.success(common('success.saved'));
-      router.push(`/${locale}/clients`);
-      router.refresh();
-    } catch (error) {
-      console.error('Error creating client:', error);
-      toast.error(common('errors.serverError'));
+    console.log('[SUPABASE] Response:', { data: result, error });
+
+    if (error) {
+      console.error('[SUPABASE ERROR]', error);
+      toast.error(`Error: ${error.message}`);
+      return;
     }
+
+    console.log('[SUCCESS] Client created:', result);
+    toast.success('Client created successfully!');
+    router.push(`/${locale}/clients`);
+    router.refresh();
   };
 
   return (
