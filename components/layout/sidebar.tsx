@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import {
   LayoutGrid,
   Users,
@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
-  { href: '/dashboard', icon: LayoutGrid, key: 'dashboard' },
+  { href: '', icon: LayoutGrid, key: 'dashboard' },
   { href: '/clients', icon: Users, key: 'clients' },
   { href: '/payments', icon: CreditCard, key: 'payments' },
   { href: '/work', icon: Hammer, key: 'work' },
@@ -29,6 +29,7 @@ const NAV_ITEMS = [
 export function Sidebar() {
   const nav = useTranslations('nav');
   const pathname = usePathname();
+  const locale = useLocale();
 
   return (
     <aside className="hidden w-60 flex-col border-r border-border/60 bg-white/70 px-4 py-6 shadow-sm backdrop-blur dark:bg-background/80 md:flex">
@@ -37,11 +38,12 @@ export function Sidebar() {
       </div>
       <nav className="flex flex-1 flex-col gap-1">
         {NAV_ITEMS.map(({ href, icon: Icon, key }) => {
-          const isActive = pathname === href || pathname?.startsWith(`${href}/`);
+          const fullHref = `/${locale}${href}`;
+          const isActive = pathname === fullHref || (href && pathname?.startsWith(fullHref));
           return (
             <Link
               key={key}
-              href={href}
+              href={fullHref}
               className={cn(
                 'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-all',
                 isActive
