@@ -1,30 +1,45 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
-const publicPaths = ['/login', '/api/cron'];
+const locales = ['en', 'es'];
+const defaultLocale = 'en';
+
+function getLocaleFromPath(pathname: string): string | null {
+  const segments = pathname.split('/');
+  if (segments.length > 1 && locales.includes(segments[1])) {
+    return segments[1];
+  }
+  return null;
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public paths
-  if (publicPaths.some((path) => pathname.startsWith(path))) {
+  // Skip API routes
+  if (pathname.startsWith('/api')) {
     return NextResponse.next();
   }
+
+  // Get locale from path or use default
+  const locale = getLocaleFromPath(pathname) || defaultLocale;
+
+  // Check if path contains login
+  const isLoginPath = pathname.includes('/login');
 
   // Update Supabase session
   const { supabaseResponse, user } = await updateSession(request);
 
-  // Redirect to login if not authenticated
-  if (!user && !pathname.startsWith('/login')) {
+  // Redirect to login if not authenticated (and not already on login page)
+  if (!user && !isLoginPath) {
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = `/${locale}/login`;
     return NextResponse.redirect(url);
   }
 
   // Redirect to dashboard if authenticated and on login page
-  if (user && pathname === '/login') {
+  if (user && isLoginPath) {
     const url = request.nextUrl.clone();
-    url.pathname = '/';
+    url.pathname = `/${locale}`;
     return NextResponse.redirect(url);
   }
 
