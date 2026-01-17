@@ -21,29 +21,35 @@ export default async function ClientDetailPage({
   const languages = await getTranslations('languages');
   const supabase = await createClient();
 
-  const { data: client } = await supabase
+  const { data: clientData } = await supabase
     .from('clients')
     .select('*')
     .eq('id', id)
     .single();
 
+  const client = clientData as any;
+
   if (!client) {
     notFound();
   }
 
-  const { data: payments } = await supabase
+  const { data: paymentsData } = await supabase
     .from('payments')
     .select('*')
     .eq('client_id', id)
     .order('invoice_date', { ascending: false })
     .limit(5);
 
-  const { data: workOrders } = await supabase
+  const payments = paymentsData as any[];
+
+  const { data: workOrdersData } = await supabase
     .from('additional_work')
     .select('*')
     .eq('client_id', id)
     .order('work_date', { ascending: false })
     .limit(5);
+
+  const workOrders = workOrdersData as any[];
 
   return (
     <div className="space-y-6">

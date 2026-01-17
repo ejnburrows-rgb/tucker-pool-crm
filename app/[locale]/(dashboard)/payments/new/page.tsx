@@ -47,8 +47,8 @@ export default function NewPaymentPage() {
     fetchClients();
   }, []);
 
-  const form = useForm<PaymentFormData>({
-    resolver: zodResolver(paymentSchema),
+  const form = useForm({
+    resolver: zodResolver(paymentSchema) as any,
     defaultValues: {
       client_id: '',
       invoice_date: new Date().toISOString().split('T')[0],

@@ -18,11 +18,13 @@ export async function POST(request: NextRequest) {
   let workType: string | undefined;
 
   if (type === 'payment') {
-    const { data: payment } = await supabase
+    const { data: paymentData } = await supabase
       .from('payments')
       .select('*, client:clients(*)')
       .eq('id', id)
       .single();
+
+    const payment = paymentData as any;
 
     if (!payment) {
       return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
@@ -32,11 +34,13 @@ export async function POST(request: NextRequest) {
     amount = payment.amount_due - payment.amount_paid;
     date = payment.due_date;
   } else if (type === 'work') {
-    const { data: work } = await supabase
+    const { data: workData } = await supabase
       .from('additional_work')
       .select('*, client:clients(*)')
       .eq('id', id)
       .single();
+
+    const work = workData as any;
 
     if (!work) {
       return NextResponse.json({ error: 'Work order not found' }, { status: 404 });
@@ -58,7 +62,7 @@ export async function POST(request: NextRequest) {
   const message = formatMessage(template, {
     amount: amount.toFixed(2),
     date,
-    work_type: workType?.replace(/_/g, ' '),
+    work_type: workType?.replace(/_/g, ' ') || '',
     zelle: process.env.ZELLE_ADDRESS || 'tucker@email.com',
     phone: process.env.BUSINESS_PHONE || '305-555-0000',
   });
@@ -67,13 +71,11 @@ export async function POST(request: NextRequest) {
     await sendSMS(client.phone, message);
 
     if (type === 'payment') {
-      await supabase
-        .from('payments')
+      await (supabase.from('payments') as any)
         .update({ reminder_sent: true, reminder_sent_at: new Date().toISOString() })
         .eq('id', id);
     } else {
-      await supabase
-        .from('additional_work')
+      await (supabase.from('additional_work') as any)
         .update({ reminder_sent: true, reminder_sent_at: new Date().toISOString() })
         .eq('id', id);
     }

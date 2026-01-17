@@ -13,9 +13,9 @@ export default async function DashboardPage() {
   const [
     { count: totalClients },
     { count: activeClients },
-    { data: overduePayments },
-    { data: pendingWork },
-    { data: todaySchedule },
+    { data: overduePaymentsData },
+    { data: pendingWorkData },
+    { data: todayScheduleData },
   ] = await Promise.all([
     supabase.from('clients').select('*', { count: 'exact', head: true }),
     supabase.from('clients').select('*', { count: 'exact', head: true }).eq('is_active', true),
@@ -23,6 +23,10 @@ export default async function DashboardPage() {
     supabase.from('additional_work').select('id').eq('status', 'pending'),
     supabase.from('schedule').select('id, client:clients(name), scheduled_time, service_type').eq('scheduled_date', new Date().toISOString().split('T')[0]).eq('status', 'scheduled'),
   ]);
+
+  const overduePayments = overduePaymentsData as any[] | null;
+  const pendingWork = pendingWorkData as any[] | null;
+  const todaySchedule = todayScheduleData as any[] | null;
 
   const overdueAmount = overduePayments?.reduce((sum, p) => sum + Number(p.amount_due), 0) || 0;
 

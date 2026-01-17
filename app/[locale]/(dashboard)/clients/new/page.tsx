@@ -57,7 +57,7 @@ export default function NewClientPage() {
 
   const onSubmit = async (data: ClientFormData) => {
     const supabase = createClient();
-    const { error } = await supabase.from('clients').insert(data);
+    const { error } = await (supabase.from('clients') as any).insert(data);
 
     if (error) {
       toast.error(common('errors.serverError'));

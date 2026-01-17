@@ -49,8 +49,8 @@ export default function NewWorkPage() {
     fetchClients();
   }, []);
 
-  const form = useForm<WorkFormData>({
-    resolver: zodResolver(workSchema),
+  const form = useForm({
+    resolver: zodResolver(workSchema) as any,
     defaultValues: {
       client_id: '',
       work_date: new Date().toISOString().split('T')[0],
@@ -93,7 +93,7 @@ export default function NewWorkPage() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>{t('workDetails')}</CardTitle>
