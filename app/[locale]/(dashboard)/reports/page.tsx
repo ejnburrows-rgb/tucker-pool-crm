@@ -33,8 +33,8 @@ export default async function ReportsPage() {
 
   const stats = [
     { label: t('totalClients'), value: totalClients ?? 0, icon: Users, color: 'text-blue-600' },
-    { label: t('activeClients'), value: activeClients ?? 0, icon: Users, color: 'text-emerald-600' },
-    { label: t('totalRevenue'), value: `$${(totalRevenue + workRevenue).toFixed(2)}`, icon: DollarSign, color: 'text-green-600' },
+    { label: t('activeClients'), value: activeClients ?? 0, icon: Users, color: 'text-blue-700' },
+    { label: t('totalRevenue'), value: `$${(totalRevenue + workRevenue).toFixed(2)}`, icon: DollarSign, color: 'text-blue-600' },
     { label: t('monthlyRevenue'), value: `$${totalRevenue.toFixed(2)}`, icon: TrendingUp, color: 'text-purple-600' },
   ];
 
@@ -63,14 +63,14 @@ export default async function ReportsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-emerald-600" />
+              <DollarSign className="h-5 w-5 text-blue-700" />
               {t('paymentsSummary')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('paid')}</span>
-              <span className="font-semibold text-green-600">{paidPayments}</span>
+              <span className="font-semibold text-blue-600">{paidPayments}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('pending')}</span>
@@ -93,7 +93,7 @@ export default async function ReportsPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('completed')}</span>
-              <span className="font-semibold text-green-600">{completedWork}</span>
+              <span className="font-semibold text-blue-600">{completedWork}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('pending')}</span>
@@ -101,7 +101,7 @@ export default async function ReportsPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('workRevenue')}</span>
-              <span className="font-semibold text-emerald-600">${workRevenue.toFixed(2)}</span>
+              <span className="font-semibold text-blue-700">${workRevenue.toFixed(2)}</span>
             </div>
           </CardContent>
         </Card>

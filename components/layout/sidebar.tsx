@@ -15,6 +15,8 @@ import {
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
+import { HelpCircle } from 'lucide-react';
+
 const NAV_ITEMS = [
   { href: '', icon: LayoutGrid, key: 'dashboard' },
   { href: '/clients', icon: Users, key: 'clients' },
@@ -24,6 +26,7 @@ const NAV_ITEMS = [
   { href: '/overdue', icon: AlertTriangle, key: 'overdue' },
   { href: '/reports', icon: BarChart, key: 'reports' },
   { href: '/settings', icon: Settings, key: 'settings' },
+  { href: '/faq', icon: HelpCircle, key: 'faq' },
 ];
 
 export function Sidebar() {
@@ -34,7 +37,7 @@ export function Sidebar() {
   return (
     <aside className="hidden w-60 flex-col border-r border-border/60 bg-white/70 px-4 py-6 shadow-sm backdrop-blur dark:bg-background/80 md:flex">
       <div className="mb-8">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-emerald-600">Navigate</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-blue-700">Navigate</h2>
       </div>
       <nav className="flex flex-1 flex-col gap-1">
         {NAV_ITEMS.map(({ href, icon: Icon, key }) => {
@@ -47,7 +50,7 @@ export function Sidebar() {
               className={cn(
                 'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-all',
                 isActive
-                  ? 'bg-emerald-100 text-emerald-900 shadow-sm dark:bg-emerald-900/20 dark:text-emerald-100'
+                  ? 'bg-blue-100 text-blue-900 shadow-sm dark:bg-blue-900/20 dark:text-blue-100'
                   : 'text-muted-foreground hover:bg-muted'
               )}
             >
@@ -57,7 +60,7 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="mt-6 rounded-lg bg-emerald-50 p-4 text-xs text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-50">
+      <div className="mt-6 rounded-lg bg-blue-50 p-4 text-xs text-blue-900 dark:bg-blue-900/30 dark:text-blue-50">
         <p className="font-semibold">Water Quality Tip</p>
         <p>Test chlorine and pH levels before adding chemicals on-site.</p>
       </div>

@@ -65,7 +65,7 @@ export default async function SchedulePage() {
           const isToday = format(day, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
 
           return (
-            <Card key={day.toISOString()} className={isToday ? 'ring-2 ring-emerald-500' : ''}>
+            <Card key={day.toISOString()} className={isToday ? 'ring-2 ring-blue-500' : ''}>
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4" />

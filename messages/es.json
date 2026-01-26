@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Tucker Pool Service CRM",
+    "appName": "R&D Pool Services CRM",
     "loading": "Cargando...",
     "save": "Guardar",
     "cancel": "Cancelar",
@@ -33,6 +33,7 @@
     "overdue": "Vencidos",
     "reports": "Reportes",
     "settings": "Configuración",
+    "faq": "Preguntas",
     "logout": "Cerrar Sesión"
   },
   "dashboard": {
@@ -189,7 +190,12 @@
     "defaultMonthlyRate": "Tarifa Mensual por Defecto",
     "defaultLaborRate": "Tarifa de Trabajo por Defecto",
     "smsTemplates": "Plantillas de SMS",
-    "saveSettings": "Guardar Configuración"
+    "saveSettings": "Guardar Configuración",
+    "dataManagement": "Gestión de Datos",
+    "dataManagementDesc": "Exportar, importar o borrar tus datos",
+    "exportData": "Exportar Respaldo",
+    "importData": "Importar Respaldo",
+    "clearData": "Borrar Todos los Datos"
   },
   "serviceDays": {
     "monday": "Lunes",
@@ -213,6 +219,24 @@
     "en": "English",
     "es": "Español"
   },
+  "welcome": {
+    "title": "Bienvenido a R&D Pool Services",
+    "subtitle": "Sistema Profesional de Limpieza y Mantenimiento de Piscinas",
+    "enter": "Iniciar / Enter"
+  },
+  "bulkImport": {
+    "title": "Importar Clientes en Masa",
+    "subtitle": "Sube archivos para extraer automáticamente información de clientes",
+    "dropzone": "Arrastra archivos aquí, o haz clic para seleccionar",
+    "supported": "Soportados: PDF, Excel, CSV, Imágenes (JPG, PNG)",
+    "processing": "Procesando archivos...",
+    "extracting": "Extrayendo datos de clientes...",
+    "preview": "Vista Previa de Clientes Extraídos",
+    "import": "Importar Todos los Clientes",
+    "clear": "Limpiar Todo",
+    "success": "¡Se importaron {count} clientes exitosamente!",
+    "error": "Error procesando archivo: {name}"
+  },
   "auth": {
     "login": "Iniciar Sesión",
     "logout": "Cerrar Sesión",
@@ -221,6 +245,28 @@
     "rememberMe": "Recordarme",
     "forgotPassword": "¿Olvidó su contraseña?",
     "invalidCredentials": "Email o contraseña inválidos"
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "subtitle": "Encuentra respuestas a preguntas comunes",
+    "searchPlaceholder": "Buscar preguntas...",
+    "noResults": "No se encontraron preguntas",
+    "q1": "¿Cómo agrego un nuevo cliente?",
+    "a1": "Ve a la página de Clientes y haz clic en 'Agregar Cliente'. Completa el nombre, teléfono, dirección, día de servicio y tarifa mensual. Haz clic en Guardar.",
+    "q2": "¿Cómo edito la información de un cliente?",
+    "a2": "Haz clic en cualquier cliente en la lista para ver sus detalles. Haz clic en el botón Editar para modificar su información.",
+    "q3": "¿Cómo registro un pago?",
+    "a3": "Ve a la página de Pagos y haz clic en 'Agregar Pago'. Selecciona el cliente, ingresa la fecha de factura y el monto. Cuando recibas el pago, actualiza el monto pagado y método de pago.",
+    "q4": "¿Cómo envío recordatorios de pago?",
+    "a4": "En la página de Vencidos, puedes ver todos los pagos atrasados. Haz clic en 'Enviar Recordatorio' junto a cualquier pago vencido para enviar un SMS al cliente.",
+    "q5": "¿Cómo programo una cita?",
+    "a5": "Ve a la página de Agenda y haz clic en 'Agregar Cita'. Selecciona el cliente, fecha, hora y tipo de servicio. La cita aparecerá en el calendario.",
+    "q6": "¿Cómo creo una orden de trabajo?",
+    "a6": "Ve a la página de Trabajos Adicionales y haz clic en 'Agregar Orden de Trabajo'. Selecciona el cliente, tipo de trabajo, ingresa costo de partes y horas de trabajo. El total se calcula automáticamente.",
+    "q7": "¿Cómo hago respaldo de mis datos?",
+    "a7": "Ve a la página de Configuración y haz clic en 'Exportar Datos' en la sección de Reportes. Esto descargará un archivo JSON con todos tus datos de clientes, pagos y órdenes de trabajo.",
+    "q8": "¿Cómo restauro datos de un respaldo?",
+    "a8": "Actualmente, la restauración de datos requiere acceso a la base de datos. Contacta a soporte para asistencia con la restauración desde un archivo de respaldo."
   },
   "errors": {
     "required": "Este campo es requerido",

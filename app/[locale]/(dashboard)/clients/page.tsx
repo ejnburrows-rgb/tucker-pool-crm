@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { PlusCircle, Phone, MapPin } from 'lucide-react';
+import { PlusCircle, Phone, MapPin, Upload } from 'lucide-react';
 import type { Client } from '@/types/database';
 
 export default async function ClientsPage({
@@ -38,12 +38,20 @@ export default async function ClientsPage({
           <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">{t('allClients')}</p>
         </div>
-        <Button asChild>
-          <Link href="clients/new">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            {t('addClient')}
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild>
+            <Link href="clients/new">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              {t('addClient')}
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="clients/import">
+              <Upload className="mr-2 h-4 w-4" />
+              Import
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-2">
@@ -83,7 +91,7 @@ export default async function ClientsPage({
                     <span>{client.city}</span>
                   </div>
                   <div className="flex items-center justify-between pt-2">
-                    <span className="font-medium text-emerald-600">${client.monthly_rate}/mo</span>
+                    <span className="font-medium text-blue-700">${client.monthly_rate}/mo</span>
                     <span>{serviceDays(client.service_day)}</span>
                   </div>
                 </CardContent>

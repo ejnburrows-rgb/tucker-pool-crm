@@ -56,7 +56,7 @@ export function Header({ onQuickAdd }: HeaderProps) {
             <Link href={`/${locale}/dashboard`} className="text-lg font-semibold tracking-tight">
               {t('appName')}
             </Link>
-            <span className="text-xs text-muted-foreground">Miami · since 2003</span>
+            <span className="text-xs text-muted-foreground">Miami · since 1990</span>
           </div>
         </div>
         <div className="flex items-center gap-2">

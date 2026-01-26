@@ -79,7 +79,7 @@ export default async function ClientDetailPage({
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3">
               <Phone className="h-4 w-4 text-muted-foreground" />
-              <a href={`tel:${client.phone}`} className="font-medium text-emerald-600 hover:underline">
+              <a href={`tel:${client.phone}`} className="font-medium text-blue-700 hover:underline">
                 {client.phone}
               </a>
             </div>
@@ -113,7 +113,7 @@ export default async function ClientDetailPage({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('monthlyRate')}</span>
-              <span className="text-lg font-bold text-emerald-600">${client.monthly_rate}</span>
+              <span className="text-lg font-bold text-blue-700">${client.monthly_rate}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('poolType')}</span>

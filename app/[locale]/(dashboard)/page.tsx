@@ -32,7 +32,7 @@ export default async function DashboardPage() {
 
   const stats = [
     { label: t('totalClients'), value: totalClients ?? 0, icon: Users, color: 'text-blue-600' },
-    { label: t('activeClients'), value: activeClients ?? 0, icon: Users, color: 'text-emerald-600' },
+    { label: t('activeClients'), value: activeClients ?? 0, icon: Users, color: 'text-blue-700' },
     { label: t('overduePayments'), value: overduePayments?.length ?? 0, icon: AlertTriangle, color: 'text-red-600' },
     { label: t('overdueAmount'), value: `$${overdueAmount.toFixed(2)}`, icon: DollarSign, color: 'text-red-600' },
     { label: t('pendingWork'), value: pendingWork?.length ?? 0, icon: Hammer, color: 'text-amber-600' },
@@ -40,9 +40,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+      <div className="text-center mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-blue-600">{t('title')}</h1>
         <p className="text-muted-foreground">{t('welcome')}</p>
+        <p className="text-sm text-blue-500 mt-1">Serving Miami since 1990</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -63,7 +64,7 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-emerald-600" />
+              <Calendar className="h-5 w-5 text-blue-700" />
               {t('todaySchedule')}
             </CardTitle>
           </CardHeader>
@@ -100,7 +101,7 @@ export default async function DashboardPage() {
                   <span className="font-semibold text-red-600">{overduePayments.length}</span> overdue payments totaling{' '}
                   <span className="font-semibold text-red-600">${overdueAmount.toFixed(2)}</span>
                 </p>
-                <Link href="/overdue" className="text-sm font-medium text-emerald-600 hover:underline">
+                <Link href="/overdue" className="text-sm font-medium text-blue-600 hover:underline">
                   View all overdue accounts →
                 </Link>
               </div>

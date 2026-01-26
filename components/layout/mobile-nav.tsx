@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 
 const NAV_ITEMS = [
-  { href: '/dashboard', key: 'dashboard' },
+  { href: '', key: 'dashboard' },
   { href: '/clients', key: 'clients' },
   { href: '/payments', key: 'payments' },
   { href: '/work', key: 'work' },
@@ -15,24 +15,27 @@ const NAV_ITEMS = [
   { href: '/overdue', key: 'overdue' },
   { href: '/reports', key: 'reports' },
   { href: '/settings', key: 'settings' },
+  { href: '/faq', key: 'faq' },
 ];
 
 export function MobileNav() {
   const pathname = usePathname();
   const nav = useTranslations('nav');
+  const locale = useLocale();
 
   return (
     <nav className="flex flex-col gap-1 p-4">
       {NAV_ITEMS.map((item, index) => {
-        const isActive = pathname?.includes(item.href);
+        const fullHref = `/${locale}${item.href}`;
+        const isActive = pathname === fullHref || (item.href && pathname?.startsWith(fullHref));
         return (
           <div key={item.key}>
             <Link
-              href={item.href}
+              href={fullHref}
               className={cn(
                 'block rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-900/20 dark:text-emerald-100'
+                  ? 'bg-blue-100 text-blue-900 dark:bg-blue-900/20 dark:text-blue-100'
                   : 'text-muted-foreground hover:bg-muted'
               )}
             >

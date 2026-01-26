@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Run Supabase Migration</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .sql-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 20px 0;
+            white-space: pre;
+        }
+        .button {
+            background: #3ecf8e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-weight: 600;
+        }
+        .button:hover {
+            background: #2fb574;
+        }
+        .button-secondary {
+            background: #666;
+        }
+        .button-secondary:hover {
+            background: #555;
+        }
+        .step {
+            background: #f0f9ff;
+            border-left: 4px solid #3ecf8e;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .step-number {
+            font-weight: bold;
+            color: #3ecf8e;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🚀 Run Database Migration</h1>
+        <p>Migration: <strong>0004_ensure_all_columns.sql</strong></p>
+        
+        <div class="step">
+            <div class="step-number">Step 1:</div>
+            Click "Copy SQL" below to copy the migration to your clipboard
+        </div>
+        
+        <div class="step">
+            <div class="step-number">Step 2:</div>
+            Click "Open Supabase SQL Editor" to open the editor in a new tab
+        </div>
+        
+        <div class="step">
+            <div class="step-number">Step 3:</div>
+            Paste (Ctrl+V) in the SQL Editor and click the green "Run" button
+        </div>
+
+        <div class="sql-box" id="sqlContent">-- Ensure all columns exist with correct types
+-- Run this in Supabase SQL Editor if you encounter any column-related errors
+
+-- Ensure payments table has all required columns
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false;
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMPTZ;
+
+-- Ensure additional_work table has all required columns  
+ALTER TABLE additional_work ADD COLUMN IF NOT EXISTS invoice_sent BOOLEAN DEFAULT false;
+ALTER TABLE additional_work ADD COLUMN IF NOT EXISTS invoice_sent_at TIMESTAMPTZ;
+ALTER TABLE additional_work ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false;
+ALTER TABLE additional_work ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMPTZ;
+
+-- Ensure schedule table has all required columns
+ALTER TABLE schedule ADD COLUMN IF NOT EXISTS confirmation_sent BOOLEAN DEFAULT false;
+ALTER TABLE schedule ADD COLUMN IF NOT EXISTS confirmation_sent_at TIMESTAMPTZ;
+
+-- Update any NULL values to defaults
+UPDATE payments SET reminder_sent = false WHERE reminder_sent IS NULL;
+UPDATE additional_work SET invoice_sent = false WHERE invoice_sent IS NULL;
+UPDATE additional_work SET reminder_sent = false WHERE reminder_sent IS NULL;
+UPDATE schedule SET confirmation_sent = false WHERE confirmation_sent IS NULL;</div>
+
+        <button class="button" onclick="copySql()">📋 Copy SQL</button>
+        <button class="button button-secondary" onclick="openSupabase()">🔗 Open Supabase SQL Editor</button>
+        
+        <p id="status" style="margin-top: 20px; color: #3ecf8e; font-weight: bold;"></p>
+    </div>
+
+    <script>
+        function copySql() {
+            const sql = document.getElementById('sqlContent').textContent;
+            navigator.clipboard.writeText(sql).then(() => {
+                document.getElementById('status').textContent = '✅ SQL copied to clipboard!';
+                setTimeout(() => {
+                    document.getElementById('status').textContent = '';
+                }, 3000);
+            });
+        }
+
+        function openSupabase() {
+            window.open('https://supabase.com/dashboard/project/ijwtylvekuirzvlreuhp/sql/new', '_blank');
+            document.getElementById('status').textContent = '✅ Supabase SQL Editor opened in new tab';
+        }
+
+        // Auto-copy on page load
+        window.onload = function() {
+            copySql();
+            setTimeout(() => {
+                openSupabase();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

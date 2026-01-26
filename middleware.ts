@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-const AUTH_COOKIE_NAME = 'tucker_auth_session';
 const locales = ['en', 'es'];
 const defaultLocale = 'en';
 
@@ -12,11 +11,6 @@ function getLocaleFromPath(pathname: string): string | null {
   return null;
 }
 
-function isAuthenticated(request: NextRequest): boolean {
-  const authCookie = request.cookies.get(AUTH_COOKIE_NAME);
-  return authCookie?.value === 'authenticated';
-}
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -25,22 +19,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Get locale from path or use default
-  const locale = getLocaleFromPath(pathname) || defaultLocale;
-  const isLoginPath = pathname.includes('/login');
-  const isLoggedIn = isAuthenticated(request);
-
-  // Redirect to login if not authenticated
-  if (!isLoggedIn && !isLoginPath) {
+  // Handle root path - redirect to welcome page
+  if (pathname === '/') {
     const url = request.nextUrl.clone();
-    url.pathname = `/${locale}/login`;
+    url.pathname = `/${defaultLocale}/welcome`;
     return NextResponse.redirect(url);
   }
 
-  // Redirect to dashboard if already logged in and trying to access login
-  if (isLoggedIn && isLoginPath) {
+  // Redirect login page to welcome (no auth required)
+  if (pathname.includes('/login')) {
+    const locale = getLocaleFromPath(pathname) || defaultLocale;
     const url = request.nextUrl.clone();
-    url.pathname = `/${locale}`;
+    url.pathname = `/${locale}/welcome`;
     return NextResponse.redirect(url);
   }
 

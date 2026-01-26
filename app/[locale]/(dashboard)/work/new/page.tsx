@@ -249,9 +249,9 @@ export default function NewWorkPage() {
                 )}
               />
 
-              <div className="flex items-center justify-between rounded-lg bg-emerald-50 p-4 sm:col-span-2">
+              <div className="flex items-center justify-between rounded-lg bg-blue-50 p-4 sm:col-span-2">
                 <span className="font-medium">{t('totalCharge')}</span>
-                <span className="text-xl font-bold text-emerald-600">${totalCharge.toFixed(2)}</span>
+                <span className="text-xl font-bold text-blue-700">${totalCharge.toFixed(2)}</span>
               </div>
             </CardContent>
           </Card>
