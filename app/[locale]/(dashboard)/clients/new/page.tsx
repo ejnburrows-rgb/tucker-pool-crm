@@ -56,11 +56,7 @@ export default function NewClientPage() {
   });
 
   const onSubmit = async (data: ClientFormData) => {
-    console.log('[CLIENT FORM] onSubmit triggered');
-    console.log('[CLIENT FORM] Form data:', data);
-    
     const supabase = createClient();
-    console.log('[SUPABASE] Client created, calling insert...');
     
     const insertData = {
       name: data.name,
@@ -75,8 +71,6 @@ export default function NewClientPage() {
       is_active: data.is_active,
       notes: data.notes || null,
     };
-    
-    console.log('[SUPABASE] Insert data:', insertData);
 
     const { data: result, error } = await (supabase
       .from('clients') as any)
@@ -84,15 +78,12 @@ export default function NewClientPage() {
       .select()
       .single();
 
-    console.log('[SUPABASE] Response:', { data: result, error });
-
     if (error) {
       console.error('[SUPABASE ERROR]', error);
       toast.error(`Error: ${error.message}`);
       return;
     }
 
-    console.log('[SUCCESS] Client created:', result);
     toast.success('Client created successfully!');
     router.push(`/${locale}/clients`);
     router.refresh();

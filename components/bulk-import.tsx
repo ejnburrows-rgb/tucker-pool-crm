@@ -23,9 +23,12 @@ interface ExtractedClient {
   selected: boolean;
 }
 
+// Helper to parse client info from OCR text
+// Supports English and Spanish labels (e.g., "Name:", "Nombre:", "Address:", "Dirección:")
+// Matches text following the label until the end of the line
 const parseClientInfo = (text: string) => {
-  const nameMatch = text.match(/(?:name|nombre|client name|nombre del cliente)\s*[:.]?\s*(.+)/i);
-  const addressMatch = text.match(/(?:address|adress|direccion|dirección)\s*[:.]?\s*(.+)/i);
+  const nameMatch = text.match(/(?:name|nombre|client name|nombre del cliente)\s*[:.]?\s*([^\n\r]+)/i);
+  const addressMatch = text.match(/(?:address|adress|direccion|dirección)\s*[:.]?\s*([^\n\r]+)/i);
 
   return {
     name: nameMatch ? nameMatch[1].trim() : '',
@@ -90,8 +93,14 @@ export function BulkImport({ onComplete }: { onComplete?: () => void }) {
             }
           }
         } else if (file.type.startsWith('image/')) {
-          const { data: { text } } = await Tesseract.recognize(file, 'eng');
+          // Use 'eng+spa' to support both English and Spanish characters/documents
+          const { data: { text } } = await Tesseract.recognize(file, 'eng+spa');
           const { name, address } = parseClientInfo(text);
+
+          if (!name && !address) {
+            toast.warning(`Could not read text from ${file.name}. Image may be blurry or contain no recognizable client data.`);
+            continue;
+          }
 
           extracted.push({
             id: `file-${Date.now()}-${Math.random()}`,
