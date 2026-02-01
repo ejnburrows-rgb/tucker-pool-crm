@@ -157,34 +157,26 @@ export default function SettingsPage() {
 
       // Import clients first (they are referenced by other tables)
       if (data.clients.length > 0) {
-        for (const client of data.clients) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await supabase.from('clients').upsert(client as any);
-        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await supabase.from('clients').upsert(data.clients as any);
       }
 
       // Import payments
       if (data.payments.length > 0) {
-        for (const payment of data.payments) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await supabase.from('payments').upsert(payment as any);
-        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await supabase.from('payments').upsert(data.payments as any);
       }
 
       // Import additional work
       if (data.additionalWork.length > 0) {
-        for (const work of data.additionalWork) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await supabase.from('additional_work').upsert(work as any);
-        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await supabase.from('additional_work').upsert(data.additionalWork as any);
       }
 
       // Import schedule
       if (data.schedule.length > 0) {
-        for (const sched of data.schedule) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await supabase.from('schedule').upsert(sched as any);
-        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await supabase.from('schedule').upsert(data.schedule as any);
       }
 
       toast.success(`Imported: ${validation.stats?.clients} clients, ${validation.stats?.payments} payments, ${validation.stats?.additionalWork} work orders, ${validation.stats?.schedule} schedule entries`);
