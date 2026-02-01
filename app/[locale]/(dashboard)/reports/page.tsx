@@ -3,39 +3,91 @@ import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, Users, TrendingUp, Calendar } from 'lucide-react';
 
+interface DashboardStats {
+  totalClients: number;
+  activeClients: number;
+  totalRevenue: number;
+  monthlyRevenue: number;
+  paidPayments: number;
+  pendingPayments: number;
+  overduePayments: number;
+  workRevenue: number;
+  completedWork: number;
+  pendingWork: number;
+}
+
 export default async function ReportsPage() {
   const t = await getTranslations('reports');
   const supabase = await createClient();
 
-  const [
-    { count: totalClients },
-    { count: activeClients },
-    { data: paymentsData },
-    { data: workData },
-  ] = await Promise.all([
-    supabase.from('clients').select('*', { count: 'exact', head: true }),
-    supabase.from('clients').select('*', { count: 'exact', head: true }).eq('is_active', true),
-    supabase.from('payments').select('amount_due, amount_paid, status'),
-    supabase.from('additional_work').select('total_charge, amount_paid, status'),
-  ]);
+  let statsData: DashboardStats;
 
-  const payments = (paymentsData as any[]) || [];
-  const work = (workData as any[]) || [];
+  // Attempt to fetch via RPC for better performance
+  const { data: rpcData, error: rpcError } = await supabase.rpc('get_dashboard_stats');
 
-  const totalRevenue = payments.reduce((sum, p) => sum + Number(p.amount_paid || 0), 0);
-  const pendingPayments = payments.filter(p => p.status === 'pending').length;
-  const overduePayments = payments.filter(p => p.status === 'overdue').length;
-  const paidPayments = payments.filter(p => p.status === 'paid').length;
+  if (!rpcError && rpcData) {
+    statsData = rpcData as DashboardStats;
+  } else {
+    // Fallback to application-side aggregation if RPC fails or doesn't exist
+    if (rpcError) {
+      console.warn('Failed to fetch dashboard stats via RPC, falling back to client-side aggregation:', rpcError);
+    }
 
-  const workRevenue = work.reduce((sum, w) => sum + Number(w.amount_paid || 0), 0);
-  const pendingWork = work.filter(w => w.status === 'pending').length;
-  const completedWork = work.filter(w => w.status === 'completed').length;
+    const [
+      { count: totalClients },
+      { count: activeClients },
+      { data: paymentsData },
+      { data: workData },
+    ] = await Promise.all([
+      supabase.from('clients').select('*', { count: 'exact', head: true }),
+      supabase.from('clients').select('*', { count: 'exact', head: true }).eq('is_active', true),
+      supabase.from('payments').select('amount_due, amount_paid, status'),
+      supabase.from('additional_work').select('total_charge, amount_paid, status'),
+    ]);
+
+    interface PaymentData {
+      amount_due: number | null;
+      amount_paid: number | null;
+      status: string;
+    }
+
+    interface WorkData {
+      total_charge: number | null;
+      amount_paid: number | null;
+      status: string;
+    }
+
+    const payments = (paymentsData as PaymentData[]) || [];
+    const work = (workData as WorkData[]) || [];
+
+    const totalRevenue = payments.reduce((sum, p) => sum + Number(p.amount_paid || 0), 0);
+    const pendingPayments = payments.filter(p => p.status === 'pending').length;
+    const overduePayments = payments.filter(p => p.status === 'overdue').length;
+    const paidPayments = payments.filter(p => p.status === 'paid').length;
+
+    const workRevenue = work.reduce((sum, w) => sum + Number(w.amount_paid || 0), 0);
+    const pendingWork = work.filter(w => w.status === 'pending').length;
+    const completedWork = work.filter(w => w.status === 'completed').length;
+
+    statsData = {
+      totalClients: totalClients ?? 0,
+      activeClients: activeClients ?? 0,
+      totalRevenue,
+      monthlyRevenue: totalRevenue,
+      paidPayments,
+      pendingPayments,
+      overduePayments,
+      workRevenue,
+      completedWork,
+      pendingWork
+    };
+  }
 
   const stats = [
-    { label: t('totalClients'), value: totalClients ?? 0, icon: Users, color: 'text-blue-600' },
-    { label: t('activeClients'), value: activeClients ?? 0, icon: Users, color: 'text-blue-700' },
-    { label: t('totalRevenue'), value: `$${(totalRevenue + workRevenue).toFixed(2)}`, icon: DollarSign, color: 'text-blue-600' },
-    { label: t('monthlyRevenue'), value: `$${totalRevenue.toFixed(2)}`, icon: TrendingUp, color: 'text-purple-600' },
+    { label: t('totalClients'), value: statsData.totalClients, icon: Users, color: 'text-blue-600' },
+    { label: t('activeClients'), value: statsData.activeClients, icon: Users, color: 'text-blue-700' },
+    { label: t('totalRevenue'), value: `$${(statsData.totalRevenue + statsData.workRevenue).toFixed(2)}`, icon: DollarSign, color: 'text-blue-600' },
+    { label: t('monthlyRevenue'), value: `$${statsData.monthlyRevenue.toFixed(2)}`, icon: TrendingUp, color: 'text-purple-600' },
   ];
 
   return (
@@ -70,15 +122,15 @@ export default async function ReportsPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('paid')}</span>
-              <span className="font-semibold text-blue-600">{paidPayments}</span>
+              <span className="font-semibold text-blue-600">{statsData.paidPayments}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('pending')}</span>
-              <span className="font-semibold text-amber-600">{pendingPayments}</span>
+              <span className="font-semibold text-amber-600">{statsData.pendingPayments}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('overdue')}</span>
-              <span className="font-semibold text-red-600">{overduePayments}</span>
+              <span className="font-semibold text-red-600">{statsData.overduePayments}</span>
             </div>
           </CardContent>
         </Card>
@@ -93,15 +145,15 @@ export default async function ReportsPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('completed')}</span>
-              <span className="font-semibold text-blue-600">{completedWork}</span>
+              <span className="font-semibold text-blue-600">{statsData.completedWork}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('pending')}</span>
-              <span className="font-semibold text-amber-600">{pendingWork}</span>
+              <span className="font-semibold text-amber-600">{statsData.pendingWork}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">{t('workRevenue')}</span>
-              <span className="font-semibold text-blue-700">${workRevenue.toFixed(2)}</span>
+              <span className="font-semibold text-blue-700">${statsData.workRevenue.toFixed(2)}</span>
             </div>
           </CardContent>
         </Card>
