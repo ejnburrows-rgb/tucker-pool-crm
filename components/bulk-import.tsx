@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Upload, FileText, X, Check, Loader2, Users } from 'lucide-react';
+import Tesseract from 'tesseract.js';
 
 interface ExtractedClient {
   id: string;
@@ -21,6 +22,16 @@ interface ExtractedClient {
   service_day: string;
   selected: boolean;
 }
+
+const parseClientInfo = (text: string) => {
+  const nameMatch = text.match(/(?:name|nombre|client name|nombre del cliente)\s*[:.]?\s*(.+)/i);
+  const addressMatch = text.match(/(?:address|adress|direccion|dirección)\s*[:.]?\s*(.+)/i);
+
+  return {
+    name: nameMatch ? nameMatch[1].trim() : '',
+    address: addressMatch ? addressMatch[1].trim() : ''
+  };
+};
 
 export function BulkImport({ onComplete }: { onComplete?: () => void }) {
   const t = useTranslations('bulkImport');
@@ -78,6 +89,20 @@ export function BulkImport({ onComplete }: { onComplete?: () => void }) {
               extracted.push(client);
             }
           }
+        } else if (file.type.startsWith('image/')) {
+          const { data: { text } } = await Tesseract.recognize(file, 'eng');
+          const { name, address } = parseClientInfo(text);
+
+          extracted.push({
+            id: `file-${Date.now()}-${Math.random()}`,
+            name: name || `Client from ${file.name}`,
+            phone: '',
+            address: address || '',
+            city: 'Miami',
+            monthly_rate: 150,
+            service_day: 'monday',
+            selected: true,
+          });
         } else {
           extracted.push({
             id: `file-${Date.now()}-${Math.random()}`,
