@@ -51,6 +51,7 @@ export default async function ClientDetailPage({
   const payments = paymentsResponse.data as any[];
   const workOrders = workOrdersResponse.data as any[];
 
+  // Render client details
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
