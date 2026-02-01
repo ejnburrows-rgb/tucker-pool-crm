@@ -249,23 +249,25 @@ export function BulkImport({ onComplete }: { onComplete?: () => void }) {
     const supabase = createClient();
     let successCount = 0;
 
-    for (const client of selectedClients) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase.from('clients') as any).insert({
-        name: client.name,
-        phone: client.phone,
-        address: client.address,
-        city: client.city,
-        monthly_rate: client.monthly_rate,
-        service_day: client.service_day,
-        pool_type: 'chlorine',
-        language: locale,
-        is_active: true,
-      });
+    const clientsToInsert = selectedClients.map((client) => ({
+      name: client.name,
+      phone: client.phone,
+      address: client.address,
+      city: client.city,
+      monthly_rate: client.monthly_rate,
+      service_day: client.service_day,
+      pool_type: 'chlorine',
+      language: locale,
+      is_active: true,
+    }));
 
-      if (!error) {
-        successCount++;
-      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from('clients') as any).insert(clientsToInsert);
+
+    if (!error) {
+      successCount = selectedClients.length;
+    } else {
+      toast.error('Failed to import clients');
     }
 
     toast.success(t('success').replace('{count}', successCount.toString()));
