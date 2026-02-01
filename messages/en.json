@@ -22,7 +22,9 @@
     "total": "Total",
     "back": "Back",
     "view": "View",
-    "details": "Details"
+    "details": "Details",
+    "import": "Import",
+    "clearSearch": "Clear search"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -70,7 +72,9 @@
     "paymentHistory": "Payment History",
     "workHistory": "Work History",
     "noPayments": "No payment records",
-    "noWork": "No work orders"
+    "noWork": "No work orders",
+    "noClients": "No clients yet",
+    "startAdding": "Start by adding a new client"
   },
   "payments": {
     "title": "Payments",

@@ -22,7 +22,9 @@
     "total": "Total",
     "back": "Volver",
     "view": "Ver",
-    "details": "Detalles"
+    "details": "Detalles",
+    "import": "Importar",
+    "clearSearch": "Borrar búsqueda"
   },
   "nav": {
     "dashboard": "Panel",
@@ -70,7 +72,9 @@
     "paymentHistory": "Historial de Pagos",
     "workHistory": "Historial de Trabajos",
     "noPayments": "Sin registros de pago",
-    "noWork": "Sin órdenes de trabajo"
+    "noWork": "Sin órdenes de trabajo",
+    "noClients": "Aún no hay clientes",
+    "startAdding": "Comience agregando un nuevo cliente"
   },
   "payments": {
     "title": "Pagos",

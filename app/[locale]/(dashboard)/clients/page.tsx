@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { PlusCircle, Phone, MapPin, Upload } from 'lucide-react';
+import { PlusCircle, Phone, MapPin, Upload, Search, SearchX, Users, UserPlus } from 'lucide-react';
 import type { Client } from '@/types/database';
 
 export default async function ClientsPage({
@@ -48,15 +48,22 @@ export default async function ClientsPage({
           <Button variant="outline" asChild>
             <Link href="clients/import">
               <Upload className="mr-2 h-4 w-4" />
-              Import
+              {common('import')}
             </Link>
           </Button>
         </div>
       </div>
 
       <div className="flex gap-2">
-        <form className="flex-1">
-          <Input name="q" placeholder={common('search')} defaultValue={params.q} />
+        <form className="relative flex-1">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            name="q"
+            placeholder={common('search')}
+            defaultValue={params.q}
+            className="pl-9"
+            aria-label={common('search')}
+          />
         </form>
         <Button variant="outline" asChild>
           <Link href="?active=true">{t('activeOnly')}</Link>
@@ -99,10 +106,28 @@ export default async function ClientsPage({
             </Link>
           ))}
         </div>
+      ) : params.q ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-10 text-center">
+            <SearchX className="mb-4 h-12 w-12 text-muted-foreground/50" />
+            <p className="text-lg font-medium text-muted-foreground">{common('noResults')}</p>
+            <Button variant="link" asChild className="mt-2">
+              <Link href="clients">{common('clearSearch')}</Link>
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
         <Card>
-          <CardContent className="py-10 text-center text-muted-foreground">
-            {common('noResults')}
+          <CardContent className="flex flex-col items-center justify-center py-10 text-center">
+            <Users className="mb-4 h-12 w-12 text-muted-foreground/50" />
+            <p className="text-lg font-medium text-muted-foreground">{t('noClients')}</p>
+            <p className="text-sm text-muted-foreground/80">{t('startAdding')}</p>
+            <Button asChild className="mt-4">
+              <Link href="clients/new">
+                <UserPlus className="mr-2 h-4 w-4" />
+                {t('addClient')}
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       )}
