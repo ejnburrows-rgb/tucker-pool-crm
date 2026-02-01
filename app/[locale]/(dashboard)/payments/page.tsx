@@ -26,7 +26,9 @@ export default async function PaymentsPage({
 
   let query = supabase
     .from('payments')
-    .select('*, client:clients(id, name, phone)')
+    .select(
+      'id, invoice_date, due_date, amount_due, amount_paid, status, days_overdue, client:clients(id, name)'
+    )
     .order('invoice_date', { ascending: false });
 
   if (params.status) {
