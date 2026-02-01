@@ -60,12 +60,18 @@ export async function GET(request: Request) {
       .like('key', 'backup_%');
 
     if (oldBackups) {
+      const keysToDelete: string[] = [];
+
       for (const backup of oldBackups) {
         const dateStr = backup.key.replace('backup_', '');
         const backupDate = new Date(dateStr);
         if (backupDate < sevenDaysAgo) {
-          await supabase.from('app_settings').delete().eq('key', backup.key);
+          keysToDelete.push(backup.key);
         }
+      }
+
+      if (keysToDelete.length > 0) {
+        await supabase.from('app_settings').delete().in('key', keysToDelete);
       }
     }
 
