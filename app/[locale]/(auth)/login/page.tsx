@@ -7,36 +7,47 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
-
-const VALID_USERNAME = 'EJN';
-const VALID_PASSWORD = 'Ejn!79021';
-const AUTH_COOKIE_NAME = 'tucker_auth_session';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const t = useTranslations('auth');
   const locale = useLocale();
   const router = useRouter();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const supabase = createClient();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-      // Set persistent cookie (expires in 1 year)
-      const expiryDate = new Date();
-      expiryDate.setFullYear(expiryDate.getFullYear() + 1);
-      document.cookie = `${AUTH_COOKIE_NAME}=authenticated; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
-      
-      console.log('[AUTH] Login successful, redirecting...');
-      router.push(`/${locale}`);
-      router.refresh();
-    } else {
-      setError('Invalid username or password');
+    // Legacy support hint for users typing the old username
+    if (email.trim().toUpperCase() === 'EJN') {
+       setError('We have updated our security. Please use email: admin@tuckerpool.com');
+       setLoading(false);
+       return;
+    }
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setError(error.message);
+      } else {
+        // Clear legacy cookie if it exists
+        document.cookie = 'tucker_auth_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        router.push(`/${locale}/dashboard`);
+        router.refresh();
+      }
+    } catch (err) {
+      setError('An unexpected error occurred');
+    } finally {
       setLoading(false);
     }
   };
@@ -50,19 +61,20 @@ export default function LoginPage() {
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="username">Username</Label>
+          <Label htmlFor="email">{t('email')}</Label>
           <Input
-            id="username"
+            id="email"
             type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            autoComplete="username"
+            placeholder="admin@tuckerpool.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            required
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t('password')}</Label>
           <Input
             id="password"
             type="password"
@@ -70,6 +82,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
+            required
           />
         </div>
 
@@ -79,7 +92,7 @@ export default function LoginPage() {
 
         <Button type="submit" className="w-full" disabled={loading}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Sign In
+          {t('login')}
         </Button>
       </form>
     </div>
