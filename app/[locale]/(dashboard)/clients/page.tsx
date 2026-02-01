@@ -19,7 +19,9 @@ export default async function ClientsPage({
   const supabase = createClient();
   const params = await searchParams;
 
-  let query = (supabase.from('clients') as any).select('*').order('name');
+  let query = (supabase.from('clients') as any)
+    .select('id, name, is_active, phone, city, monthly_rate, service_day')
+    .order('name');
 
   if (params.active === 'true') {
     query = query.eq('is_active', true);
