@@ -120,25 +120,29 @@ export function BulkImport({ onComplete }: { onComplete?: () => void }) {
     const supabase = createClient();
     let successCount = 0;
 
-    for (const client of selectedClients) {
-      const { error } = await (supabase.from('clients') as any).insert({
-        name: client.name,
-        phone: client.phone,
-        address: client.address,
-        city: client.city,
-        monthly_rate: client.monthly_rate,
-        service_day: client.service_day,
-        pool_type: 'chlorine',
-        language: locale,
-        is_active: true,
-      });
+    const clientsToInsert = selectedClients.map((client) => ({
+      name: client.name,
+      phone: client.phone,
+      address: client.address,
+      city: client.city,
+      monthly_rate: client.monthly_rate,
+      service_day: client.service_day,
+      pool_type: 'chlorine',
+      language: locale,
+      is_active: true,
+    }));
 
-      if (!error) {
-        successCount++;
-      }
+    const { data, error } = await (supabase.from('clients') as any)
+      .insert(clientsToInsert)
+      .select();
+
+    if (error) {
+      console.error('Bulk import failed:', error);
+      toast.error(t('error').replace('{name}', 'Batch Import'));
+    } else {
+      successCount = data ? data.length : 0;
+      toast.success(t('success').replace('{count}', successCount.toString()));
     }
-
-    toast.success(t('success').replace('{count}', successCount.toString()));
     setExtractedClients([]);
     setFiles([]);
     setIsImporting(false);
