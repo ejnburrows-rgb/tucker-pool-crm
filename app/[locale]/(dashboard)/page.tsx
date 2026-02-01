@@ -5,6 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Users, DollarSign, AlertTriangle, Calendar, Hammer } from 'lucide-react';
 import Link from 'next/link';
 
+interface OverdueStats {
+  count: number;
+  total_amount: number;
+}
+
 export default async function DashboardPage() {
   const t = await getTranslations('dashboard');
   const nav = await getTranslations('nav');
@@ -13,29 +18,28 @@ export default async function DashboardPage() {
   const [
     { count: totalClients },
     { count: activeClients },
-    { data: overduePaymentsData },
-    { data: pendingWorkData },
+    { data: overdueStatsData },
+    { count: pendingWorkCount },
     { data: todayScheduleData },
   ] = await Promise.all([
     supabase.from('clients').select('*', { count: 'exact', head: true }),
     supabase.from('clients').select('*', { count: 'exact', head: true }).eq('is_active', true),
-    supabase.from('payments').select('amount_due').eq('status', 'overdue'),
-    supabase.from('additional_work').select('id').eq('status', 'pending'),
+    supabase.rpc('get_overdue_payments_stats'),
+    supabase.from('additional_work').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('schedule').select('id, client:clients(name), scheduled_time, service_type').eq('scheduled_date', new Date().toISOString().split('T')[0]).eq('status', 'scheduled'),
   ]);
 
-  const overduePayments = overduePaymentsData as any[] | null;
-  const pendingWork = pendingWorkData as any[] | null;
+  const overdueStats = (overdueStatsData as unknown as OverdueStats[])?.[0] || { count: 0, total_amount: 0 };
+  const overdueCount = overdueStats.count ?? 0;
+  const overdueAmount = overdueStats.total_amount ?? 0;
   const todaySchedule = todayScheduleData as any[] | null;
-
-  const overdueAmount = overduePayments?.reduce((sum, p) => sum + Number(p.amount_due), 0) || 0;
 
   const stats = [
     { label: t('totalClients'), value: totalClients ?? 0, icon: Users, color: 'text-blue-600' },
     { label: t('activeClients'), value: activeClients ?? 0, icon: Users, color: 'text-blue-700' },
-    { label: t('overduePayments'), value: overduePayments?.length ?? 0, icon: AlertTriangle, color: 'text-red-600' },
-    { label: t('overdueAmount'), value: `$${overdueAmount.toFixed(2)}`, icon: DollarSign, color: 'text-red-600' },
-    { label: t('pendingWork'), value: pendingWork?.length ?? 0, icon: Hammer, color: 'text-amber-600' },
+    { label: t('overduePayments'), value: overdueCount, icon: AlertTriangle, color: 'text-red-600' },
+    { label: t('overdueAmount'), value: `$${Number(overdueAmount).toFixed(2)}`, icon: DollarSign, color: 'text-red-600' },
+    { label: t('pendingWork'), value: pendingWorkCount ?? 0, icon: Hammer, color: 'text-amber-600' },
   ];
 
   return (
@@ -95,11 +99,11 @@ export default async function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {overduePayments && overduePayments.length > 0 ? (
+            {overdueCount > 0 ? (
               <div className="space-y-2">
                 <p className="text-sm">
-                  <span className="font-semibold text-red-600">{overduePayments.length}</span> overdue payments totaling{' '}
-                  <span className="font-semibold text-red-600">${overdueAmount.toFixed(2)}</span>
+                  <span className="font-semibold text-red-600">{overdueCount}</span> overdue payments totaling{' '}
+                  <span className="font-semibold text-red-600">${Number(overdueAmount).toFixed(2)}</span>
                 </p>
                 <Link href="/overdue" className="text-sm font-medium text-blue-600 hover:underline">
                   View all overdue accounts →
