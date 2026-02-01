@@ -48,15 +48,15 @@ class PrimaryStorage {
 
   async save(data: unknown): Promise<boolean> {
     try {
-      const serialized = JSON.stringify(data);
-      const checksum = await generateChecksum(serialized);
+      // Optimized: Only store metadata in localStorage to avoid blocking the main thread
+      // with large JSON serialization and synchronous writes. Data is stored in IndexedDB.
       const backup: VersionedBackup = {
-        data,
+        data: null,
         meta: {
           version: Date.now(),
           timestamp: Date.now(),
-          checksum,
-          size: serialized.length,
+          checksum: 'offloaded-to-indexeddb',
+          size: 0,
         },
       };
       localStorage.setItem(this.key, JSON.stringify(backup));
@@ -73,6 +73,13 @@ class PrimaryStorage {
       if (!raw) return null;
       
       const backup: VersionedBackup = JSON.parse(raw);
+
+      // If data is null (new format), we consider it valid metadata-only
+      if (backup.data === null) {
+        return { data: null, valid: true };
+      }
+
+      // Legacy support: verify checksum for old full backups
       const currentChecksum = await generateChecksum(JSON.stringify(backup.data));
       const valid = currentChecksum === backup.meta.checksum;
       
@@ -358,16 +365,16 @@ class BackupManager {
   }
 
   async recover(): Promise<{ source: string; data: CRMBackupData } | null> {
-    // Try primary first
-    const primary = await this.primary.load();
-    if (primary?.valid && primary.data) {
-      return { source: 'localStorage', data: primary.data as CRMBackupData };
-    }
-    
-    // Fall back to IndexedDB
+    // Try IndexedDB first as it is now the primary data store
     const indexed = await this.indexedDB.getLatest();
     if (indexed) {
       return { source: 'indexedDB', data: indexed as CRMBackupData };
+    }
+
+    // Fallback to localStorage (legacy support or if IDB failed but localStorage somehow has data)
+    const primary = await this.primary.load();
+    if (primary?.valid && primary.data) {
+      return { source: 'localStorage', data: primary.data as CRMBackupData };
     }
     
     // Try corrupted primary as last resort
