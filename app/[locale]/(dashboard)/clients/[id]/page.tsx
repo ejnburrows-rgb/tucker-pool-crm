@@ -33,23 +33,23 @@ export default async function ClientDetailPage({
     notFound();
   }
 
-  const { data: paymentsData } = await supabase
-    .from('payments')
-    .select('*')
-    .eq('client_id', id)
-    .order('invoice_date', { ascending: false })
-    .limit(5);
+  const [paymentsResponse, workOrdersResponse] = await Promise.all([
+    supabase
+      .from('payments')
+      .select('*')
+      .eq('client_id', id)
+      .order('invoice_date', { ascending: false })
+      .limit(5),
+    supabase
+      .from('additional_work')
+      .select('*')
+      .eq('client_id', id)
+      .order('work_date', { ascending: false })
+      .limit(5),
+  ]);
 
-  const payments = paymentsData as any[];
-
-  const { data: workOrdersData } = await supabase
-    .from('additional_work')
-    .select('*')
-    .eq('client_id', id)
-    .order('work_date', { ascending: false })
-    .limit(5);
-
-  const workOrders = workOrdersData as any[];
+  const payments = paymentsResponse.data as any[];
+  const workOrders = workOrdersResponse.data as any[];
 
   return (
     <div className="space-y-6">
