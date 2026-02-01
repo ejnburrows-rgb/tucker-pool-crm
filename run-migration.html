@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Run Supabase Migration</title>
+    <title>Run Supabase Security Migration</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            max-width: 800px;
+            max-width: 900px;
             margin: 50px auto;
             padding: 20px;
             background: #f5f5f5;
@@ -15,10 +15,18 @@
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
         h1 {
             color: #333;
             margin-top: 0;
+            border-bottom: 2px solid #3ecf8e;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #444;
+            margin-top: 0;
+            font-size: 1.2em;
         }
         .sql-box {
             background: #1e1e1e;
@@ -30,6 +38,8 @@
             overflow-x: auto;
             margin: 20px 0;
             white-space: pre;
+            max-height: 400px;
+            overflow-y: auto;
         }
         .button {
             background: #3ecf8e;
@@ -60,56 +70,128 @@
         .step-number {
             font-weight: bold;
             color: #3ecf8e;
+            margin-bottom: 5px;
+        }
+        .warning {
+            background: #fff0f0;
+            border-left: 4px solid #ff4d4f;
+            padding: 15px;
+            margin: 15px 0;
+            color: #d32f2f;
+        }
+        code {
+            background: #e6e6e6;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>🚀 Run Database Migration</h1>
-        <p>Migration: <strong>0004_ensure_all_columns.sql</strong></p>
+        <h1>🔒 Secure Your Database</h1>
+        <p>This process will secure your database and set up the login system.</p>
         
-        <div class="step">
-            <div class="step-number">Step 1:</div>
-            Click "Copy SQL" below to copy the migration to your clipboard
-        </div>
-        
-        <div class="step">
-            <div class="step-number">Step 2:</div>
-            Click "Open Supabase SQL Editor" to open the editor in a new tab
-        </div>
-        
-        <div class="step">
-            <div class="step-number">Step 3:</div>
-            Paste (Ctrl+V) in the SQL Editor and click the green "Run" button
+        <div class="warning">
+            <strong>Important:</strong> You must do this to make the Login page work!
         </div>
 
-        <div class="sql-box" id="sqlContent">-- Ensure all columns exist with correct types
--- Run this in Supabase SQL Editor if you encounter any column-related errors
+        <div class="step">
+            <div class="step-number">Step 1: Apply Security Rules</div>
+            1. Click "Copy SQL" below.<br>
+            2. Click "Open Supabase SQL Editor".<br>
+            3. Paste the code and click "Run".
+        </div>
 
--- Ensure payments table has all required columns
-ALTER TABLE payments ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false;
-ALTER TABLE payments ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMPTZ;
+        <div class="sql-box" id="sqlContent">-- Enable RLS on all tables (idempotent)
+ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE additional_work ENABLE ROW LEVEL SECURITY;
+ALTER TABLE schedule ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sms_templates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE app_settings ENABLE ROW LEVEL SECURITY;
 
--- Ensure additional_work table has all required columns  
-ALTER TABLE additional_work ADD COLUMN IF NOT EXISTS invoice_sent BOOLEAN DEFAULT false;
-ALTER TABLE additional_work ADD COLUMN IF NOT EXISTS invoice_sent_at TIMESTAMPTZ;
-ALTER TABLE additional_work ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false;
-ALTER TABLE additional_work ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMPTZ;
+-- Drop insecure policies if they exist (from 0002_disable_rls.sql)
+DROP POLICY IF EXISTS "Enable read access for all users" ON clients;
+DROP POLICY IF EXISTS "Enable insert access for all users" ON clients;
+DROP POLICY IF EXISTS "Enable update access for all users" ON clients;
+DROP POLICY IF EXISTS "Enable delete access for all users" ON clients;
 
--- Ensure schedule table has all required columns
-ALTER TABLE schedule ADD COLUMN IF NOT EXISTS confirmation_sent BOOLEAN DEFAULT false;
-ALTER TABLE schedule ADD COLUMN IF NOT EXISTS confirmation_sent_at TIMESTAMPTZ;
+DROP POLICY IF EXISTS "Enable read access for all users" ON payments;
+DROP POLICY IF EXISTS "Enable insert access for all users" ON payments;
+DROP POLICY IF EXISTS "Enable update access for all users" ON payments;
+DROP POLICY IF EXISTS "Enable delete access for all users" ON payments;
 
--- Update any NULL values to defaults
-UPDATE payments SET reminder_sent = false WHERE reminder_sent IS NULL;
-UPDATE additional_work SET invoice_sent = false WHERE invoice_sent IS NULL;
-UPDATE additional_work SET reminder_sent = false WHERE reminder_sent IS NULL;
-UPDATE schedule SET confirmation_sent = false WHERE confirmation_sent IS NULL;</div>
+DROP POLICY IF EXISTS "Enable read access for all users" ON additional_work;
+DROP POLICY IF EXISTS "Enable insert access for all users" ON additional_work;
+DROP POLICY IF EXISTS "Enable update access for all users" ON additional_work;
+DROP POLICY IF EXISTS "Enable delete access for all users" ON additional_work;
+
+DROP POLICY IF EXISTS "Enable read access for all users" ON schedule;
+DROP POLICY IF EXISTS "Enable insert access for all users" ON schedule;
+DROP POLICY IF EXISTS "Enable update access for all users" ON schedule;
+DROP POLICY IF EXISTS "Enable delete access for all users" ON schedule;
+
+DROP POLICY IF EXISTS "Enable read access for all users" ON app_settings;
+DROP POLICY IF EXISTS "Enable insert access for all users" ON app_settings;
+DROP POLICY IF EXISTS "Enable update access for all users" ON app_settings;
+DROP POLICY IF EXISTS "Enable delete access for all users" ON app_settings;
+
+DROP POLICY IF EXISTS "Enable read access for all users" ON sms_templates;
+DROP POLICY IF EXISTS "Enable insert access for all users" ON sms_templates;
+DROP POLICY IF EXISTS "Enable update access for all users" ON sms_templates;
+DROP POLICY IF EXISTS "Enable delete access for all users" ON sms_templates;
+
+-- Revoke public access from anon
+REVOKE ALL ON clients FROM anon;
+REVOKE ALL ON payments FROM anon;
+REVOKE ALL ON additional_work FROM anon;
+REVOKE ALL ON schedule FROM anon;
+REVOKE ALL ON app_settings FROM anon;
+REVOKE ALL ON sms_templates FROM anon;
+
+-- Grant access to authenticated users
+GRANT ALL ON clients TO authenticated;
+GRANT ALL ON payments TO authenticated;
+GRANT ALL ON additional_work TO authenticated;
+GRANT ALL ON schedule TO authenticated;
+GRANT ALL ON app_settings TO authenticated;
+GRANT ALL ON sms_templates TO authenticated;
+
+-- Create policies for authenticated users (Full Access)
+-- Re-creating them to ensure they exist and are correct
+DROP POLICY IF EXISTS "Enable all for authenticated users" ON clients;
+CREATE POLICY "Enable all for authenticated users" ON clients FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Enable all for authenticated users" ON payments;
+CREATE POLICY "Enable all for authenticated users" ON payments FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Enable all for authenticated users" ON additional_work;
+CREATE POLICY "Enable all for authenticated users" ON additional_work FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Enable all for authenticated users" ON schedule;
+CREATE POLICY "Enable all for authenticated users" ON schedule FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Enable all for authenticated users" ON sms_templates;
+CREATE POLICY "Enable all for authenticated users" ON sms_templates FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Enable all for authenticated users" ON app_settings;
+CREATE POLICY "Enable all for authenticated users" ON app_settings FOR ALL USING (auth.role() = 'authenticated');</div>
 
         <button class="button" onclick="copySql()">📋 Copy SQL</button>
         <button class="button button-secondary" onclick="openSupabase()">🔗 Open Supabase SQL Editor</button>
         
-        <p id="status" style="margin-top: 20px; color: #3ecf8e; font-weight: bold;"></p>
+        <p id="status" style="margin-top: 10px; color: #3ecf8e; font-weight: bold; height: 20px;"></p>
+    </div>
+
+    <div class="card">
+        <div class="step">
+            <div class="step-number">Step 2: Create Your User</div>
+            After running the SQL above, run this command in your terminal to create your login:
+        </div>
+        <div class="sql-box" style="margin: 10px 0;">npx tsx scripts/seed-user.ts</div>
+        <button class="button" onclick="copyCommand()">📋 Copy Command</button>
+        <p id="cmdStatus" style="margin-top: 10px; color: #3ecf8e; font-weight: bold; height: 20px;"></p>
     </div>
 
     <script>
@@ -117,24 +199,20 @@ UPDATE schedule SET confirmation_sent = false WHERE confirmation_sent IS NULL;</
             const sql = document.getElementById('sqlContent').textContent;
             navigator.clipboard.writeText(sql).then(() => {
                 document.getElementById('status').textContent = '✅ SQL copied to clipboard!';
-                setTimeout(() => {
-                    document.getElementById('status').textContent = '';
-                }, 3000);
+                setTimeout(() => { document.getElementById('status').textContent = ''; }, 3000);
+            });
+        }
+
+        function copyCommand() {
+            navigator.clipboard.writeText("npx tsx scripts/seed-user.ts").then(() => {
+                document.getElementById('cmdStatus').textContent = '✅ Command copied!';
+                setTimeout(() => { document.getElementById('cmdStatus').textContent = ''; }, 3000);
             });
         }
 
         function openSupabase() {
             window.open('https://supabase.com/dashboard/project/ijwtylvekuirzvlreuhp/sql/new', '_blank');
-            document.getElementById('status').textContent = '✅ Supabase SQL Editor opened in new tab';
         }
-
-        // Auto-copy on page load
-        window.onload = function() {
-            copySql();
-            setTimeout(() => {
-                openSupabase();
-            }, 500);
-        };
     </script>
 </body>
 </html>
