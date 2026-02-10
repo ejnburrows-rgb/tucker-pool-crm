@@ -18,7 +18,9 @@ export default async function SchedulePage() {
 
   const { data: appointments } = await supabase
     .from('schedule')
-    .select('*, client:clients(id, name, address, city, gate_code)')
+    .select(
+      'id, scheduled_date, scheduled_time, status, client:clients(id, name, city)'
+    )
     .gte('scheduled_date', weekStart.toISOString().split('T')[0])
     .lte('scheduled_date', weekEnd.toISOString().split('T')[0])
     .order('scheduled_date')
