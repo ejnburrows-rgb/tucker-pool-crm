@@ -1,16 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createClient } from '@/lib/supabase/client';
 import { workSchema, type WorkFormData } from '@/lib/validations/work';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ClientSelect } from '@/components/client-select';
 import {
   Select,
   SelectContent,
@@ -28,32 +27,14 @@ import {
 } from '@/components/ui/form';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { WORK_TYPES, PAYMENT_METHODS, DEFAULT_LABOR_RATE } from '@/lib/constants';
-import type { Client } from '@/types/database';
+import { WORK_TYPES, DEFAULT_LABOR_RATE } from '@/lib/constants';
 
 export default function NewWorkPage() {
   const t = useTranslations('work');
   const common = useTranslations('common');
   const workTypes = useTranslations('work.workTypes');
-  const paymentMethods = useTranslations('paymentMethods');
   const router = useRouter();
   const locale = useLocale();
-  const [clients, setClients] = useState<Client[]>([]);
-
-  useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const response = await fetch('/api/clients?active=true');
-        if (response.ok) {
-          const data = await response.json();
-          setClients(data as Client[]);
-        }
-      } catch (error) {
-        console.error('Error fetching clients:', error);
-      }
-    };
-    fetchClients();
-  }, []);
 
   const form = useForm({
     resolver: zodResolver(workSchema) as any,
@@ -120,20 +101,12 @@ export default function NewWorkPage() {
                 render={({ field }) => (
                   <FormItem className="sm:col-span-2">
                     <FormLabel>Client</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select client" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {clients.map((client) => (
-                          <SelectItem key={client.id} value={client.id}>
-                            {client.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <ClientSelect
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
