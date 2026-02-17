@@ -11,17 +11,21 @@ export default async function OverduePage() {
   const common = await getTranslations('common');
   const supabase = await createClient();
 
-  const { data: overduePayments } = await supabase
-    .from('payments')
-    .select('*, client:clients(id, name, phone, language)')
-    .eq('status', 'overdue')
-    .order('days_overdue', { ascending: false });
-
-  const { data: overdueWork } = await supabase
-    .from('additional_work')
-    .select('*, client:clients(id, name, phone, language)')
-    .eq('status', 'overdue')
-    .order('work_date', { ascending: true });
+  const [
+    { data: overduePayments },
+    { data: overdueWork }
+  ] = await Promise.all([
+    supabase
+      .from('payments')
+      .select('*, client:clients(id, name, phone, language)')
+      .eq('status', 'overdue')
+      .order('days_overdue', { ascending: false }),
+    supabase
+      .from('additional_work')
+      .select('*, client:clients(id, name, phone, language)')
+      .eq('status', 'overdue')
+      .order('work_date', { ascending: true })
+  ]);
 
   const totalPaymentsOverdue = overduePayments?.reduce((sum, p: any) => sum + Number(p.amount_due - p.amount_paid), 0) || 0;
   const totalWorkOverdue = overdueWork?.reduce((sum, w: any) => sum + Number(w.total_charge - w.amount_paid), 0) || 0;
