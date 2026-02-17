@@ -1,15 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createClient } from '@/lib/supabase/client';
 import { paymentSchema, type PaymentFormData } from '@/lib/validations/payment';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ClientSelect } from '@/components/client-select';
 import {
   Select,
   SelectContent,
@@ -28,7 +27,6 @@ import {
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { PAYMENT_METHODS } from '@/lib/constants';
-import type { Client } from '@/types/database';
 
 export default function NewPaymentPage() {
   const t = useTranslations('payments');
@@ -36,22 +34,6 @@ export default function NewPaymentPage() {
   const paymentMethods = useTranslations('paymentMethods');
   const router = useRouter();
   const locale = useLocale();
-  const [clients, setClients] = useState<Client[]>([]);
-
-  useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const response = await fetch('/api/clients?active=true');
-        if (response.ok) {
-          const data = await response.json();
-          setClients(data as Client[]);
-        }
-      } catch (error) {
-        console.error('Error fetching clients:', error);
-      }
-    };
-    fetchClients();
-  }, []);
 
   const form = useForm({
     resolver: zodResolver(paymentSchema) as any,
@@ -65,17 +47,6 @@ export default function NewPaymentPage() {
       reminder_sent: false,
     },
   });
-
-  const selectedClientId = form.watch('client_id');
-
-  useEffect(() => {
-    if (selectedClientId) {
-      const client = clients.find((c) => c.id === selectedClientId);
-      if (client) {
-        form.setValue('amount_due', client.monthly_rate);
-      }
-    }
-  }, [selectedClientId, clients, form]);
 
   const onSubmit = async (data: PaymentFormData) => {
     try {
@@ -119,20 +90,15 @@ export default function NewPaymentPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('selectClient')}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('selectClient')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {clients.map((client) => (
-                          <SelectItem key={client.id} value={client.id}>
-                            {client.name} - ${client.monthly_rate}/mo
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <ClientSelect
+                        value={field.value}
+                        onChange={field.onChange}
+                        onSelectClient={(client) => {
+                          form.setValue('amount_due', client.monthly_rate);
+                        }}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
