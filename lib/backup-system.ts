@@ -39,6 +39,88 @@ async function generateChecksum(data: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
 }
 
+/**
+ * Offloads heavy JSON parsing, serialization and checksum calculation to a Web Worker.
+ * This prevents the main thread from blocking during legacy backup recovery.
+ */
+async function verifyLegacyBackup(raw: string): Promise<{ data: unknown; valid: boolean } | null> {
+  return new Promise((resolve) => {
+    try {
+      const workerCode = `
+        self.onmessage = async (e) => {
+          try {
+            const raw = e.data;
+            const backup = JSON.parse(raw);
+
+            if (!backup) {
+              self.postMessage({ result: null });
+              return;
+            }
+
+            if (backup.data === null) {
+              self.postMessage({ result: { data: null, valid: true } });
+              return;
+            }
+
+            // Heavy work: stringify and hash
+            const dataStr = JSON.stringify(backup.data);
+            const encoder = new TextEncoder();
+            const dataBuffer = encoder.encode(dataStr);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const currentChecksum = hashArray
+              .map(b => b.toString(16).padStart(2, '0'))
+              .join('')
+              .slice(0, 16);
+
+            const valid = currentChecksum === (backup.meta && backup.meta.checksum);
+            self.postMessage({ result: { data: backup.data, valid } });
+          } catch (err) {
+            self.postMessage({ error: err.message });
+          }
+        };
+      `;
+
+      const blob = new Blob([workerCode], { type: 'application/javascript' });
+      const blobURL = URL.createObjectURL(blob);
+      const worker = new Worker(blobURL);
+
+      worker.onmessage = (e) => {
+        if (e.data.error) {
+          console.error('[Backup] Worker error:', e.data.error);
+          resolve(null);
+        } else {
+          resolve(e.data.result);
+        }
+        worker.terminate();
+        URL.revokeObjectURL(blobURL);
+      };
+
+      worker.onerror = (err) => {
+        console.error('[Backup] Worker fatal error:', err);
+        resolve(null);
+        worker.terminate();
+        URL.revokeObjectURL(blobURL);
+      };
+
+      worker.postMessage(raw);
+    } catch (err) {
+      console.error('[Backup] Failed to spawn worker, falling back to main thread:', err);
+      // Fallback to main thread if Worker fails to spawn
+      try {
+        const backup = JSON.parse(raw);
+        if (backup.data === null) return resolve({ data: null, valid: true });
+
+        generateChecksum(JSON.stringify(backup.data)).then(checksum => {
+          resolve({ data: backup.data, valid: checksum === backup.meta.checksum });
+        }).catch(() => resolve(null));
+      } catch {
+        resolve(null);
+      }
+    }
+  });
+}
+
 class PrimaryStorage {
   private key: string;
 
@@ -72,22 +154,17 @@ class PrimaryStorage {
       const raw = localStorage.getItem(this.key);
       if (!raw) return null;
       
-      const backup: VersionedBackup = JSON.parse(raw);
+      // Use Worker-based verification to avoid blocking the main thread
+      // with JSON.parse, JSON.stringify and checksum calculation.
+      const result = await verifyLegacyBackup(raw);
 
-      // If data is null (new format), we consider it valid metadata-only
-      if (backup.data === null) {
-        return { data: null, valid: true };
-      }
-
-      // Legacy support: verify checksum for old full backups
-      const currentChecksum = await generateChecksum(JSON.stringify(backup.data));
-      const valid = currentChecksum === backup.meta.checksum;
+      if (!result) return null;
       
-      if (!valid) {
+      if (!result.valid) {
         console.warn('[Backup] Checksum mismatch detected - data may be corrupted');
       }
       
-      return { data: backup.data, valid };
+      return result;
     } catch (error) {
       console.error('[Backup] Primary storage load failed:', error);
       return null;
