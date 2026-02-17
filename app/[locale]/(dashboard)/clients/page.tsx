@@ -7,11 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { PlusCircle, Phone, MapPin, Upload, Search, SearchX, Users, UserPlus } from 'lucide-react';
 import type { Client } from '@/types/database';
+import { PaginationControls } from '@/components/ui/pagination-controls';
 
 export default async function ClientsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; active?: string }>;
+  searchParams: Promise<{ q?: string; active?: string; page?: string }>;
 }) {
   const t = await getTranslations('clients');
   const common = await getTranslations('common');
@@ -19,7 +20,15 @@ export default async function ClientsPage({
   const supabase = await createClient();
   const params = await searchParams;
 
-  let query = (supabase.from('clients') as any).select('*').order('name');
+  const page = Number(params.page) || 1;
+  const pageSize = 12;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let query = (supabase.from('clients') as any)
+    .select('*', { count: 'exact' })
+    .order('name');
 
   if (params.active === 'true') {
     query = query.eq('is_active', true);
@@ -29,7 +38,11 @@ export default async function ClientsPage({
     query = query.ilike('name', `%${params.q}%`);
   }
 
-  const { data: clients } = await query;
+  // Apply pagination
+  query = query.range(from, to);
+
+  const { data: clients, count } = await query;
+  const totalPages = count ? Math.ceil(count / pageSize) : 0;
 
   return (
     <div className="space-y-6">
@@ -130,6 +143,15 @@ export default async function ClientsPage({
             </Button>
           </CardContent>
         </Card>
+      )}
+
+      {totalPages > 1 && (
+        <PaginationControls
+          currentPage={page}
+          totalPages={totalPages}
+          previousLabel={common('back')} // Using 'Back' as fallback for Previous
+          nextLabel="Next" // Hardcoded for now as 'Next' key is missing
+        />
       )}
     </div>
   );
