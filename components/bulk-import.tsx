@@ -66,6 +66,12 @@ async function resizeImage(file: File): Promise<Blob> {
   });
 }
 
+// Regex constants for OCR parsing (hoisted for performance)
+const NAME_REGEX = /^[A-Z][a-z]+(\s[A-Z][a-z]+)+$/;
+const DIGIT_REGEX = /\d/;
+const ADDRESS_REGEX = /^\d+\s+[A-Za-z]+/;
+const PHONE_REGEX = /(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
+
 // Helper: Parse OCR text for client data
 function parseClientDataFromOcr(text: string): Partial<ExtractedClient> {
   const lines = text.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
@@ -74,7 +80,7 @@ function parseClientDataFromOcr(text: string): Partial<ExtractedClient> {
   // Simple heuristics
   // Name: First line that looks like a name (capitalized words, no digits, at least 2 words)
   for (const line of lines) {
-    if (/^[A-Z][a-z]+(\s[A-Z][a-z]+)+$/.test(line) && !/\d/.test(line)) {
+    if (NAME_REGEX.test(line) && !DIGIT_REGEX.test(line)) {
       data.name = line;
       break;
     }
@@ -82,7 +88,7 @@ function parseClientDataFromOcr(text: string): Partial<ExtractedClient> {
 
   // Address: Look for patterns starting with digits
   for (const line of lines) {
-    if (/^\d+\s+[A-Za-z]+/.test(line)) {
+    if (ADDRESS_REGEX.test(line)) {
       data.address = line;
       // Heuristic: Check if line or next lines contain city
       if (line.toLowerCase().includes('miami')) {
@@ -93,7 +99,7 @@ function parseClientDataFromOcr(text: string): Partial<ExtractedClient> {
   }
 
   // Phone: Look for phone patterns
-  const phoneMatch = text.match(/(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
+  const phoneMatch = text.match(PHONE_REGEX);
   if (phoneMatch) {
     data.phone = phoneMatch[0];
   }

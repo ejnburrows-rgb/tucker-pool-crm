@@ -1,15 +1,15 @@
 
 > tucker-pool-crm@0.1.0 dev
-> next dev
+> next dev -p 3000
 
 ▲ Next.js 16.1.3 (Turbopack)
 - Local:         http://localhost:3000
 - Network:       http://192.168.0.2:3000
-- Environments: .env.local
 - Experiments (use with caution):
   · serverActions
 
 ✓ Starting...
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-✓ Ready in 1734ms
- GET /en/login 200 in 4.0s (compile: 3.1s, proxy.ts: 142ms, generate-params: 677ms, render: 721ms)
+✓ Ready in 1447ms
+ GET /en/login 200 in 3.5s (compile: 2.7s, proxy.ts: 6ms, generate-params: 567ms, render: 723ms)
+ GET /en/welcome-test 200 in 1643ms (compile: 1454ms, proxy.ts: 9ms, generate-params: 541ms, render: 180ms)
