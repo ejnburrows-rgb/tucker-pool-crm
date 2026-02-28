@@ -2,7 +2,10 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navigation from './components/Navigation';
+import ScrollProgress from './components/ScrollProgress';
+import BackToTop from './components/BackToTop';
 import HeroSection from './sections/HeroSection';
+import StatsSection from './sections/StatsSection';
 import FeatureSection from './sections/FeatureSection';
 import HowItWorksSection from './sections/HowItWorksSection';
 import TestimonialsSection from './sections/TestimonialsSection';
@@ -23,7 +26,7 @@ function App() {
       const pinned = ScrollTrigger.getAll()
         .filter(st => st.vars.pin)
         .sort((a, b) => a.start - b.start);
-      
+
       const maxScroll = ScrollTrigger.maxScroll(window);
       if (!maxScroll || pinned.length === 0) return;
 
@@ -68,10 +71,13 @@ function App() {
 
   return (
     <div ref={mainRef} className="relative bg-[#0A0A0A] min-h-screen grain">
+      <ScrollProgress />
       <Navigation />
-      
+      <BackToTop />
+
       <main className="relative">
         <HeroSection />
+        <StatsSection />
         <FeatureSection />
         <HowItWorksSection />
         <TestimonialsSection />

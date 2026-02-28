@@ -19,6 +19,38 @@ section {
   pointer-events: auto;
 }
 
+/* Animate-in utility */
+.animate-in {
+  animation: animate-in 0.3s ease-out;
+}
+
+@keyframes animate-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glow effect for highlighted elements */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.15),
+              0 0 60px rgba(34, 211, 238, 0.05);
+}
+
+/* Pulse animation for status dots */
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-pulse {
+  animation: status-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .glass-card {
@@ -46,7 +78,8 @@ section {
 /* Focus styles for accessibility */
 button:focus-visible,
 a:focus-visible,
-input:focus-visible {
+input:focus-visible,
+textarea:focus-visible {
   outline: 2px solid #22D3EE;
   outline-offset: 2px;
 }
@@ -55,4 +88,24 @@ input:focus-visible {
 button,
 [role="button"] {
   user-select: none;
+}
+
+/* Textarea styling */
+textarea {
+  font-family: inherit;
+}
+
+/* Dialog overlay fix */
+[data-state="open"] {
+  animation: fade-in 0.2s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Tabular numbers for counters */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }

@@ -2,7 +2,6 @@ import { useRef, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Check, Sparkles } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -65,8 +64,7 @@ export default function PricingSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState('');
+  const [isAnnual, setIsAnnual] = useState(false);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -109,8 +107,30 @@ export default function PricingSection() {
   }, []);
 
   const handleCTAClick = (planName: string) => {
-    setSelectedPlan(planName);
-    setIsDialogOpen(true);
+    // Scroll to the contact/demo form with the plan name pre-filled
+    const ctaSection = document.getElementById('cta');
+    if (ctaSection) {
+      ctaSection.scrollIntoView({ behavior: 'smooth' });
+      // After scrolling, try to pre-fill the company field with plan info
+      setTimeout(() => {
+        const companyInput = document.getElementById('company') as HTMLInputElement;
+        if (companyInput) {
+          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+            window.HTMLInputElement.prototype,
+            'value'
+          )?.set;
+          nativeInputValueSetter?.call(companyInput, `Interested in ${planName} plan`);
+          companyInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }, 800);
+    }
+  };
+
+  const getPrice = (basePrice: number) => {
+    if (isAnnual) {
+      return Math.round(basePrice * 0.8); // 20% discount for annual
+    }
+    return basePrice;
   };
 
   return (
@@ -128,9 +148,35 @@ export default function PricingSection() {
           <h2 className="text-[#F5F5F5] font-extrabold text-[clamp(32px,4vw,48px)] tracking-tight mb-4">
             Simple, Transparent <span className="text-[#22D3EE]">Pricing</span>
           </h2>
-          <p className="text-[#A1A1AA] text-lg max-w-2xl mx-auto">
+          <p className="text-[#A1A1AA] text-lg max-w-2xl mx-auto mb-8">
             Start free for 14 days. No credit card required. Cancel anytime.
           </p>
+
+          {/* Billing toggle */}
+          <div className="flex items-center justify-center gap-3">
+            <span className={`text-sm font-medium transition-colors ${!isAnnual ? 'text-[#F5F5F5]' : 'text-[#A1A1AA]'}`}>
+              Monthly
+            </span>
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className={`relative w-12 h-6 rounded-full transition-colors ${isAnnual ? 'bg-[#22D3EE]' : 'bg-white/[0.15]'
+                }`}
+              aria-label="Toggle annual billing"
+            >
+              <div
+                className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform ${isAnnual ? 'translate-x-6' : 'translate-x-0.5'
+                  }`}
+              />
+            </button>
+            <span className={`text-sm font-medium transition-colors ${isAnnual ? 'text-[#F5F5F5]' : 'text-[#A1A1AA]'}`}>
+              Annual
+            </span>
+            {isAnnual && (
+              <span className="px-2 py-0.5 bg-[#22D3EE]/10 text-[#22D3EE] text-xs font-semibold rounded-full animate-in fade-in">
+                Save 20%
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Pricing Cards */}
@@ -141,11 +187,10 @@ export default function PricingSection() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`pricing-card relative p-8 rounded-[18px] transition-all ${
-                plan.highlighted
-                  ? 'bg-gradient-to-b from-[#22D3EE]/20 to-[#1F1F1F] border-2 border-[#22D3EE]/50 scale-105 z-10'
+              className={`pricing-card relative p-8 rounded-[18px] transition-all duration-300 ${plan.highlighted
+                  ? 'bg-gradient-to-b from-[#22D3EE]/20 to-[#1F1F1F] border-2 border-[#22D3EE]/50 scale-105 z-10 shadow-xl shadow-[#22D3EE]/5'
                   : 'glass-card-light hover:bg-white/[0.05]'
-              }`}
+                }`}
             >
               {/* Popular badge */}
               {plan.highlighted && (
@@ -167,10 +212,15 @@ export default function PricingSection() {
               <div className="mb-8">
                 <div className="flex items-baseline gap-1">
                   <span className="text-[#F5F5F5] font-extrabold text-4xl lg:text-5xl">
-                    ${plan.price}
+                    ${getPrice(plan.price)}
                   </span>
                   <span className="text-[#A1A1AA] text-sm">/{plan.period}</span>
                 </div>
+                {isAnnual && (
+                  <p className="text-[#22D3EE] text-xs mt-1">
+                    Billed ${getPrice(plan.price) * 12}/year
+                  </p>
+                )}
               </div>
 
               {/* Features */}
@@ -188,11 +238,10 @@ export default function PricingSection() {
               {/* CTA */}
               <button
                 onClick={() => handleCTAClick(plan.name)}
-                className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all ${
-                  plan.highlighted
-                    ? 'bg-[#22D3EE] text-[#0A0A0A] hover:bg-[#06B6D4]'
-                    : 'bg-white/[0.05] text-[#F5F5F5] border border-white/[0.1] hover:bg-white/[0.08]'
-                }`}
+                className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${plan.highlighted
+                    ? 'bg-[#22D3EE] text-[#0A0A0A] hover:bg-[#06B6D4] hover:shadow-lg hover:shadow-[#22D3EE]/20 hover:scale-[1.02]'
+                    : 'bg-white/[0.05] text-[#F5F5F5] border border-white/[0.1] hover:bg-white/[0.08] hover:scale-[1.02]'
+                  }`}
               >
                 {plan.cta}
               </button>
@@ -205,31 +254,6 @@ export default function PricingSection() {
           All plans include SSL security, daily backups, and 99.9% uptime guarantee.
         </p>
       </div>
-
-      {/* Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-[#111111] border-white/[0.06] text-[#F5F5F5]">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold">
-              Coming Soon
-            </DialogTitle>
-            <DialogDescription className="text-[#A1A1AA]">
-              The {selectedPlan} plan signup is coming soon. Book a demo to get early access!
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-4">
-            <button
-              onClick={() => {
-                setIsDialogOpen(false);
-                document.getElementById('cta')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="w-full py-3 px-4 bg-[#22D3EE] text-[#0A0A0A] rounded-xl font-semibold text-sm hover:bg-[#06B6D4] transition-colors"
-            >
-              Book a Demo
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </section>
   );
 }
