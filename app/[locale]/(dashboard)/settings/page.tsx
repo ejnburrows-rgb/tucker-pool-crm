@@ -19,7 +19,7 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState({
     business_name: 'R&D Pool Services',
     business_phone: '305-555-0000',
-    business_email: '',
+    business_email: 'rodeanddavid@yahoo.com',
     zelle_address: '',
     default_monthly_rate: 150,
     default_labor_rate: 75,
@@ -35,7 +35,7 @@ export default function SettingsPage() {
             setSettings({
               business_name: data.settings.business_name || 'Tucker Pool Service',
               business_phone: data.settings.business_phone || '305-555-0000',
-              business_email: data.settings.business_email || '',
+              business_email: data.settings.business_email || 'rodeanddavid@yahoo.com',
               zelle_address: data.settings.zelle_address || '',
               default_monthly_rate: data.settings.default_monthly_rate || 150,
               default_labor_rate: data.settings.default_labor_rate || 75,

@@ -26,16 +26,34 @@ export default function LoginPage() {
 
     // Legacy support hint for users typing the old username
     if (email.trim().toUpperCase() === 'EJN') {
-       setError('We have updated our security. Please use email: admin@tuckerpool.com');
+       setError('We have updated our security. Please use email: rodeanddavid@yahoo.com');
        setLoading(false);
        return;
     }
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
+      const normalizedEmail = email.trim().toLowerCase();
+
+      let { error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
         password,
       });
+
+      if (error?.message?.toLowerCase().includes('invalid login credentials') && normalizedEmail === 'rodeanddavid@yahoo.com') {
+        const bootstrapResponse = await fetch('/api/auth/ensure-owner', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: normalizedEmail, password }),
+        });
+
+        if (bootstrapResponse.ok) {
+          const retry = await supabase.auth.signInWithPassword({
+            email: normalizedEmail,
+            password,
+          });
+          error = retry.error;
+        }
+      }
 
       if (error) {
         setError(error.message);
@@ -65,7 +83,7 @@ export default function LoginPage() {
           <Input
             id="email"
             type="text"
-            placeholder="admin@tuckerpool.com"
+            placeholder="rodeanddavid@yahoo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
