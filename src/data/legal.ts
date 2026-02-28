@@ -161,22 +161,22 @@ export const aboutContent = {
     title: 'About R&D Pool Services',
     sections: [
         {
-            heading: 'Our Mission',
-            content: `R&D Pool Services was founded with a simple mission: to give pool service businesses the technology they deserve. We saw too many pool pros juggling spreadsheets, sticky notes, and text messages to manage their operations. Tucker CRM changes that.`,
+            heading: 'Our Story',
+            content: `R&D Pool Services was founded in Miami with a simple belief: every pool owner deserves crystal clear water and reliable, honest service. What started as a two-person operation has grown into one of Miami-Dade County's most trusted pool service companies, serving over 500 residential and commercial clients.`,
         },
         {
-            heading: 'Why Tucker CRM',
-            content: `Named after our founder's first pool route in Miami, Tucker CRM is built by people who understand the pool service industry from the inside out. We know your crews speak different languages, your schedules change daily, and payment follow-ups are the worst part of the job.
+            heading: 'Why Choose Us',
+            content: `We're not just another pool company. We're your neighbors. Our technicians live in the communities they serve, and many have been with us for over a decade. We speak English and Spanish fluently — because Miami is a bilingual city and your pool service should be too.
 
-That's why we built a CRM that's bilingual from day one, simple enough for anyone on your team to use, and powerful enough to handle everything from scheduling to automated payment reminders.`,
+Every visit includes a detailed service report with photos, chemical readings, and equipment status. You'll always know exactly what we did and how your pool is performing.`,
         },
         {
             heading: 'Our Team',
-            content: `Based in Miami, FL, our team combines decades of experience in pool service operations with modern software engineering. We're pool people building tech, not tech people guessing about pools.`,
+            content: `Our certified pool technicians are trained in CPO (Certified Pool Operator) standards, licensed by the State of Florida, and carry full insurance. We invest in ongoing education so our team stays current with the latest equipment, chemicals, and best practices.`,
         },
         {
-            heading: 'Powered by NBO',
-            content: `Tucker CRM is proudly built and maintained in partnership with NBO, bringing enterprise-grade technology to small and medium pool service businesses.`,
+            heading: 'Service Area',
+            content: `We proudly serve all of Miami-Dade County including Miami, Miami Beach, Coral Gables, Coconut Grove, Brickell, Doral, Kendall, Homestead, Key Biscayne, and surrounding areas. Not sure if we cover your area? Give us a call — we're always expanding.`,
         },
     ],
 };

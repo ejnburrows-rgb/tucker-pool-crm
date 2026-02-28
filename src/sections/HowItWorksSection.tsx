@@ -1,31 +1,31 @@
 import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { UserPlus, CalendarCheck, Wallet } from 'lucide-react';
+import { PhoneCall, ClipboardCheck, Sparkles } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const steps = [
   {
     number: '01',
-    icon: UserPlus,
-    title: 'Add Your Clients',
+    icon: PhoneCall,
+    title: 'Call or Request a Quote',
     description:
-      'Import your client list or add them one by one. The bilingual interface works seamlessly in English and Spanish.',
+      'Call us or fill out the form below. We\'ll discuss your pool, schedule a visit, and give you a free no-obligation estimate. Servicio en Español disponible.',
   },
   {
     number: '02',
-    icon: CalendarCheck,
-    title: 'Schedule Services',
+    icon: ClipboardCheck,
+    title: 'We Inspect & Plan',
     description:
-      'Drag and drop appointments on the weekly calendar. Assign technicians and set recurring service schedules.',
+      'Our certified technicians inspect your pool, test the water chemistry, check all equipment, and create a custom service plan tailored to your pool.',
   },
   {
     number: '03',
-    icon: Wallet,
-    title: 'Track Payments',
+    icon: Sparkles,
+    title: 'Enjoy Crystal Clear Water',
     description:
-      'Monitor paid, pending, and overdue invoices. Send automated reminders and export reports in one click.',
+      'Sit back and relax. We handle everything — cleaning, chemicals, equipment, and reporting. Your pool stays pristine, always swim-ready.',
   },
 ];
 
@@ -36,7 +36,6 @@ export default function HowItWorksSection() {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // Header animation
       gsap.fromTo(
         headerRef.current,
         { y: 30, opacity: 0 },
@@ -52,7 +51,6 @@ export default function HowItWorksSection() {
         }
       );
 
-      // Cards stagger animation
       const cards = cardsRef.current?.querySelectorAll('.step-card');
       if (cards) {
         gsap.fromTo(
@@ -90,10 +88,10 @@ export default function HowItWorksSection() {
             How It Works
           </span>
           <h2 className="text-[#F5F5F5] font-extrabold text-[clamp(32px,4vw,48px)] tracking-tight mb-4">
-            Get Started in <span className="text-[#22D3EE]">3 Steps</span>
+            Getting Started is <span className="text-[#22D3EE]">Easy</span>
           </h2>
           <p className="text-[#A1A1AA] text-lg max-w-2xl mx-auto">
-            No complex setup. No training required. Start managing your pool service business in minutes.
+            From first call to crystal clear water — we make pool care effortless.
           </p>
         </div>
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight, Phone } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -59,7 +59,6 @@ export default function HeroSection() {
           pin: true,
           scrub: 0.6,
           onLeaveBack: () => {
-            // Reset elements when scrolling back to top
             gsap.set([headlineRef.current, ctaRef.current], { opacity: 1, y: 0 });
             gsap.set(bgRef.current, { opacity: 1, scale: 1 });
           },
@@ -112,7 +111,7 @@ export default function HeroSection() {
       >
         <img
           src="/hero-pool.jpg"
-          alt="Pool background"
+          alt="Crystal clear pool service"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/70 via-[#0A0A0A]/50 to-[#0A0A0A]/90" />
@@ -129,21 +128,21 @@ export default function HeroSection() {
           <div ref={headlineRef} className="mb-8 lg:mb-12">
             <h1 className="text-[#F5F5F5] font-extrabold tracking-tight leading-[0.95] uppercase">
               <span className="headline-line block text-[clamp(32px,6vw,72px)]">
-                Run Your Pool
+                Miami's Premier
               </span>
               <span className="headline-line block text-[clamp(32px,6vw,72px)]">
-                Service Business
+                Pool Service
               </span>
               <span className="headline-line block text-[clamp(32px,6vw,72px)]">
-                Like A <span className="text-[#22D3EE]">Pro</span>
+                <span className="text-[#22D3EE]">Experts</span>
               </span>
             </h1>
           </div>
 
           {/* Subheadline */}
           <p className="headline-line text-[#A1A1AA] text-base sm:text-lg max-w-xl mx-auto mb-8 lg:mb-10">
-            The bilingual CRM built for pool service teams. Manage clients, schedules, 
-            payments, and reminders—all in English y Español.
+            Professional pool cleaning, maintenance, and repair services.
+            Crystal clear water, every visit. Servicio en Inglés y Español.
           </p>
 
           {/* CTAs */}
@@ -152,16 +151,16 @@ export default function HeroSection() {
               onClick={() => scrollToSection('#cta')}
               className="group flex items-center gap-2 px-8 py-4 bg-[#F5F5F5] text-[#0A0A0A] rounded-xl font-semibold text-base hover:bg-white transition-all hover:scale-[1.02] hover:-translate-y-0.5"
             >
-              Book a Demo
+              Get a Free Quote
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
-            <button
-              onClick={() => scrollToSection('#features')}
+            <a
+              href="tel:+13055550142"
               className="group flex items-center gap-2 px-8 py-4 bg-white/[0.05] text-[#F5F5F5] rounded-xl font-semibold text-base border border-white/[0.1] hover:bg-white/[0.08] transition-all"
             >
-              <Play size={18} className="text-[#22D3EE]" />
-              Start Using CRM
-            </button>
+              <Phone size={18} className="text-[#22D3EE]" />
+              (305) 555-0142
+            </a>
           </div>
         </div>
       </div>

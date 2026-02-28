@@ -2,107 +2,106 @@ import { useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
+  Droplets,
+  Wrench,
+  ShieldCheck,
+  Sparkles,
+  ThermometerSun,
+  Beaker,
   Calendar,
-  ClipboardList,
-  CreditCard,
-  AlertCircle,
-  Database,
-  Bell,
-  BarChart3,
-  Globe,
+  Clock,
 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const features = [
+const services = [
   {
-    id: 'bilingual',
-    icon: Globe,
-    headline: 'Bilingual.',
-    highlight: 'Simple.',
-    subheadline: 'Built for your team.',
-    description: 'Switch languages instantly. Your crew and office stay aligned.',
+    id: 'cleaning',
+    icon: Droplets,
+    headline: 'Weekly Cleaning.',
+    highlight: 'Clear.',
+    subheadline: 'Crystal',
+    description: 'Skimming, vacuuming, brushing, and filter cleaning. Every visit, guaranteed.',
     image: '/ui-clients.jpg',
-    label: 'CLIENTS',
+    label: 'CLEANING',
   },
   {
-    id: 'schedule',
-    icon: Calendar,
-    headline: 'Weekly Schedule.',
-    highlight: 'Drop.',
-    subheadline: 'Drag. Done.',
-    description: 'See the week at a glance. Reassign in seconds.',
+    id: 'maintenance',
+    icon: Wrench,
+    headline: 'Equipment Repair.',
+    highlight: 'Done Right.',
+    subheadline: 'Pumps, filters,',
+    description: 'Expert repair and replacement of pumps, filters, heaters, and automation systems.',
     image: '/ui-schedule.jpg',
-    label: 'SCHEDULE',
+    label: 'MAINTENANCE',
   },
   {
-    id: 'workorders',
-    icon: ClipboardList,
-    headline: 'Work Orders.',
-    highlight: 'To Field.',
-    subheadline: 'From phone',
-    description: 'Create, assign, and track jobs—online or offline.',
+    id: 'chemistry',
+    icon: Beaker,
+    headline: 'Water Chemistry.',
+    highlight: 'Balance.',
+    subheadline: 'Perfect',
+    description: 'pH, chlorine, alkalinity, and stabilizer testing. Lab-grade precision.',
     image: '/ui-workorders.jpg',
-    label: 'WORK ORDERS',
+    label: 'CHEMISTRY',
   },
   {
-    id: 'payments',
-    icon: CreditCard,
-    headline: 'Payments.',
-    highlight: "Chase What's Not.",
-    subheadline: "See what's paid.",
-    description: 'Filter by status. Export in one click.',
+    id: 'inspection',
+    icon: ShieldCheck,
+    headline: 'Pool Inspections.',
+    highlight: 'Reports.',
+    subheadline: 'Detailed',
+    description: 'Pre-sale, insurance, and compliance inspections with comprehensive documentation.',
     image: '/ui-payments.jpg',
-    label: 'PAYMENTS',
+    label: 'INSPECTIONS',
   },
   {
-    id: 'overdue',
-    icon: AlertCircle,
-    headline: 'Overdue Dashboard.',
-    highlight: 'Lose',
-    subheadline: 'Never',
-    description: 'Auto-reminders + follow-up history.',
-    thirdLine: 'a payment.',
+    id: 'resurfacing',
+    icon: Sparkles,
+    headline: 'Resurfacing.',
+    highlight: 'New.',
+    subheadline: 'Like Brand',
+    description: 'Plaster, pebble, and quartz finishes. Transform your pool in days.',
     image: '/ui-overdue.jpg',
-    label: 'OVERDUE',
+    label: 'RESURFACING',
   },
   {
-    id: 'backups',
-    icon: Database,
-    headline: 'Backups.',
-    highlight: 'Safe.',
-    subheadline: 'Your data,',
-    description: 'Daily snapshots. One-click restore.',
+    id: 'heating',
+    icon: ThermometerSun,
+    headline: 'Heating Systems.',
+    highlight: 'Round.',
+    subheadline: 'Swim Year',
+    description: 'Gas, electric, and solar heater installation, repair, and optimization.',
     image: '/ui-backups.jpg',
-    label: 'BACKUPS',
+    label: 'HEATING',
   },
   {
-    id: 'reminders',
-    icon: Bell,
-    headline: 'Reminders.',
-    highlight: "You Don't.",
-    subheadline: 'They forget.',
-    description: 'SMS + email. Scheduled automatically.',
+    id: 'scheduling',
+    icon: Calendar,
+    headline: 'Flexible Plans.',
+    highlight: 'Schedule.',
+    subheadline: 'Your',
+    description: 'Weekly, bi-weekly, or custom service plans. We work around your schedule.',
     image: '/ui-reminders.jpg',
-    label: 'REMINDERS',
+    label: 'PLANS',
   },
   {
-    id: 'reports',
-    icon: BarChart3,
-    headline: 'Reports.',
-    highlight: 'Insights.',
-    subheadline: 'Real-time',
-    description: 'Track revenue, performance, and growth metrics.',
+    id: 'emergency',
+    icon: Clock,
+    headline: 'Emergency Service.',
+    highlight: 'Response.',
+    subheadline: 'Same-Day',
+    description: 'Green pool rescue, leak detection, and after-storm cleanups. Call anytime.',
     image: '/ui-payments.jpg',
-    label: 'REPORTS',
+    label: 'EMERGENCY',
   },
 ];
 
-function FeatureCard({
-  feature,
+function ServiceCard({
+  service,
   index,
 }: {
-  feature: (typeof features)[0];
+  service: (typeof services)[0];
   index: number;
 }) {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -137,8 +136,6 @@ function FeatureCard({
         0.06
       );
 
-      // SETTLE (30% - 70%) - hold
-
       // EXIT (70% - 100%)
       scrollTl.fromTo(
         headlineRef.current,
@@ -165,14 +162,14 @@ function FeatureCard({
     return () => ctx.revert();
   }, [index]);
 
-  const Icon = feature.icon;
+  const Icon = service.icon;
 
   return (
     <div
       ref={sectionRef}
       className="relative w-full h-screen overflow-hidden"
       style={{ zIndex: 20 + index }}
-      id={index === 0 ? 'features' : undefined}
+      id={index === 0 ? 'services' : undefined}
     >
       {/* Background */}
       <div
@@ -203,21 +200,18 @@ function FeatureCard({
                   <Icon size={20} className="text-[#22D3EE]" />
                 </div>
                 <span className="text-xs font-mono tracking-[0.12em] text-[#22D3EE] uppercase">
-                  {feature.label}
+                  {service.label}
                 </span>
               </div>
               <h2 className="text-[#F5F5F5] font-extrabold tracking-tight leading-[1.05] uppercase text-[clamp(28px,4vw,48px)]">
-                <span className="block">{feature.headline}</span>
+                <span className="block">{service.headline}</span>
                 <span className="block">
-                  {feature.subheadline}{' '}
-                  <span className="text-[#22D3EE]">{feature.highlight}</span>
+                  {service.subheadline}{' '}
+                  <span className="text-[#22D3EE]">{service.highlight}</span>
                 </span>
-                {feature.thirdLine && (
-                  <span className="block text-[#F5F5F5]">{feature.thirdLine}</span>
-                )}
               </h2>
               <p className="mt-4 text-[#A1A1AA] text-base max-w-md mx-auto lg:mx-0">
-                {feature.description}
+                {service.description}
               </p>
             </div>
 
@@ -228,8 +222,8 @@ function FeatureCard({
             >
               <div className="glass-card overflow-hidden w-full max-w-[420px] lg:max-w-[480px]">
                 <img
-                  src={feature.image}
-                  alt={`${feature.label} interface`}
+                  src={service.image}
+                  alt={`${service.label} service`}
                   className="w-full h-auto object-cover"
                 />
               </div>
@@ -244,8 +238,8 @@ function FeatureCard({
 export default function FeatureSection() {
   return (
     <div className="relative">
-      {features.map((feature, index) => (
-        <FeatureCard key={feature.id} feature={feature} index={index} />
+      {services.map((service, index) => (
+        <ServiceCard key={service.id} service={service} index={index} />
       ))}
     </div>
   );
