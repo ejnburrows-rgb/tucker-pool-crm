@@ -180,24 +180,26 @@ export default function LoginPage({ onLogin }: { onLogin: () => void }) {
 
             {/* NBO Logo — Bottom Right */}
             <div
-                className={`absolute bottom-4 right-5 sm:bottom-6 sm:right-8 transition-all duration-700 delay-500 ${mounted ? 'opacity-[0.35]' : 'opacity-0'
+                className={`absolute bottom-5 right-5 sm:bottom-8 sm:right-10 transition-all duration-700 delay-500 ${mounted ? 'opacity-[0.55]' : 'opacity-0'
                     }`}
             >
                 <img
                     src="/nbo-logo.png"
                     alt="NBO - Novo Business Order"
-                    className="w-[60px] sm:w-[72px] h-auto select-none"
+                    className="w-[90px] sm:w-[120px] lg:w-[140px] h-auto select-none"
                     draggable={false}
-                    style={{ filter: 'grayscale(100%) brightness(0.7)' }}
+                    style={{
+                        filter: 'drop-shadow(0 2px 8px rgba(192, 192, 192, 0.12)) brightness(0.9)',
+                    }}
                 />
             </div>
 
             {/* Bottom copyright — subtle */}
             <div
-                className={`absolute bottom-4 left-1/2 -translate-x-1/2 transition-all duration-700 delay-600 ${mounted ? 'opacity-30' : 'opacity-0'
+                className={`absolute bottom-4 left-1/2 -translate-x-1/2 transition-all duration-700 delay-500 ${mounted ? 'opacity-30' : 'opacity-0'
                     }`}
             >
-                <p className="text-[#444] text-[10px] tracking-wider">
+                <p className="text-[#555] text-[10px] tracking-wider">
                     © 2026 R&D Pool Services
                 </p>
             </div>
