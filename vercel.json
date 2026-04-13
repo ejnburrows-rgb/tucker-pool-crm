@@ -1,11 +1,4 @@
 {
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/website",
-      "permanent": false
-    }
-  ],
   "functions": {
     "api/cron/keep-alive/index.ts": {
       "runtime": "nodejs20.x"
