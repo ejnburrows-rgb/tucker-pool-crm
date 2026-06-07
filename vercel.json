@@ -1,6 +1,12 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/website",
+      "destination": "/"
+    }
+  ],
   "functions": {
     "api/cron/keep-alive/index.ts": {
       "runtime": "nodejs20.x"
