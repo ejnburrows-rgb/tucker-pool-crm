@@ -1,9 +1,10 @@
 {
-  "redirects": [
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
     {
-      "source": "/",
-      "destination": "/website",
-      "permanent": false
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ],
   "functions": {

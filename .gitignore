@@ -7,6 +7,7 @@ dist/
 # IDE
 .vscode/
 .idea/
+.vs/
 
 # OS
 .DS_Store
@@ -20,4 +21,3 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
-".vs/"  
